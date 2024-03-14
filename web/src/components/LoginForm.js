@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { UserContext } from '../context/User';
 import { API, getLogo, isMobile, showError, showInfo, showSuccess, showWarning } from '../helpers';
-import { onGitHubOAuthClicked } from './utils';
+import { onGitHubOAuthClicked, onLinuxDoOAuthClicked } from './utils';
 import Turnstile from "react-turnstile";
 import { Layout, Card, Image, Form, Button, Divider, Modal, Icon } from '@douyinfe/semi-ui';
 import Title from "@douyinfe/semi-ui/lib/es/typography/title";
@@ -10,6 +10,7 @@ import Text from "@douyinfe/semi-ui/lib/es/typography/text";
 import TelegramLoginButton from 'react-telegram-login';
 
 import { IconGithubLogo } from '@douyinfe/semi-icons';
+import LinuxDoIcon from './LinuxDoIcon';
 import WeChatIcon from './WeChatIcon';
 
 const LoginForm = () => {
@@ -165,7 +166,7 @@ const LoginForm = () => {
                                         忘记密码 <Link to='/reset'>点击重置</Link>
                                     </Text>
                                 </div>
-                                {status.github_oauth || status.wechat_login || status.telegram_oauth ? (
+                                {status.github_oauth || status.linuxdo_oauth || status.wechat_login || status.telegram_oauth ? (
                                     <>
                                         <Divider margin='12px' align='center'>
                                             第三方登录
@@ -176,6 +177,16 @@ const LoginForm = () => {
                                                     type='primary'
                                                     icon={<IconGithubLogo />}
                                                     onClick={() => onGitHubOAuthClicked(status.github_client_id)}
+                                                />
+                                            ) : (
+                                                <></>
+                                            )}
+                                            {status.linuxdo_oauth ? (
+                                                <Button
+                                                    type='primary'
+                                                    icon={<LinuxDoIcon />}
+                                                    style={{color: '#000'}}
+                                                    onClick={() => onLinuxDoOAuthClicked(status.linuxdo_client_id)}
                                                 />
                                             ) : (
                                                 <></>

@@ -2,44 +2,50 @@ package controller
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"net/url"
 	"one-api/common"
 	"one-api/model"
 	"strconv"
 	"time"
 )
 
-type GitHubOAuthResponse struct {
+type LinuxDoOAuthResponse struct {
 	AccessToken string `json:"access_token"`
 	Scope       string `json:"scope"`
 	TokenType   string `json:"token_type"`
 }
 
-type GitHubUser struct {
-	Login string `json:"login"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+type LinuxDoUser struct {
+	ID         int    `json:"id"`
+	Username   string `json:"username"`
+	Name       string `json:"name"`
+	Active     bool   `json:"active"`
+	TrustLevel int    `json:"trust_level"`
+	Silenced   bool   `json:"silenced"`
 }
 
-func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
+func getLinuxDoUserInfoByCode(code string) (*LinuxDoUser, error) {
 	if code == "" {
 		return nil, errors.New("无效的参数")
 	}
-	values := map[string]string{"client_id": common.GitHubClientId, "client_secret": common.GitHubClientSecret, "code": code}
-	jsonData, err := json.Marshal(values)
+	auth := base64.StdEncoding.EncodeToString([]byte(common.LinuxDoClientId + ":" + common.LinuxDoClientSecret))
+	form := url.Values{
+		"grant_type": {"authorization_code"},
+		"code":       {code},
+	}
+	req, err := http.NewRequest("POST", "https://connect.linux.do/oauth2/token", bytes.NewBufferString(form.Encode()))
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", "https://github.com/login/oauth/access_token", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Authorization", "Basic "+auth)
 	req.Header.Set("Accept", "application/json")
 	client := http.Client{
 		Timeout: 5 * time.Second,
@@ -47,15 +53,15 @@ func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 	res, err := client.Do(req)
 	if err != nil {
 		common.SysLog(err.Error())
-		return nil, errors.New("无法连接至 GitHub 服务器，请稍后重试！")
+		return nil, errors.New("无法连接至 LINUX DO 服务器，请稍后重试！")
 	}
 	defer res.Body.Close()
-	var oAuthResponse GitHubOAuthResponse
+	var oAuthResponse LinuxDoOAuthResponse
 	err = json.NewDecoder(res.Body).Decode(&oAuthResponse)
 	if err != nil {
 		return nil, err
 	}
-	req, err = http.NewRequest("GET", "https://api.github.com/user", nil)
+	req, err = http.NewRequest("GET", "https://connect.linux.do/api/user", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -63,21 +69,21 @@ func getGitHubUserInfoByCode(code string) (*GitHubUser, error) {
 	res2, err := client.Do(req)
 	if err != nil {
 		common.SysLog(err.Error())
-		return nil, errors.New("无法连接至 GitHub 服务器，请稍后重试！")
+		return nil, errors.New("无法连接至 LINUX DO 服务器，请稍后重试！")
 	}
 	defer res2.Body.Close()
-	var githubUser GitHubUser
-	err = json.NewDecoder(res2.Body).Decode(&githubUser)
+	var linuxdoUser LinuxDoUser
+	err = json.NewDecoder(res2.Body).Decode(&linuxdoUser)
 	if err != nil {
 		return nil, err
 	}
-	if githubUser.Login == "" {
+	if linuxdoUser.ID == 0 {
 		return nil, errors.New("返回值非法，用户字段为空，请稍后重试！")
 	}
-	return &githubUser, nil
+	return &linuxdoUser, nil
 }
 
-func GitHubOAuth(c *gin.Context) {
+func LinuxDoOAuth(c *gin.Context) {
 	session := sessions.Default(c)
 	state := c.Query("state")
 	if state == "" || session.Get("oauth_state") == nil || state != session.Get("oauth_state").(string) {
@@ -89,19 +95,19 @@ func GitHubOAuth(c *gin.Context) {
 	}
 	username := session.Get("username")
 	if username != nil {
-		GitHubBind(c)
+		LinuxDoBind(c)
 		return
 	}
 
-	if !common.GitHubOAuthEnabled {
+	if !common.LinuxDoOAuthEnabled {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "管理员未开启通过 GitHub 登录以及注册",
+			"message": "管理员未开启通过 LINUX DO 登录以及注册",
 		})
 		return
 	}
 	code := c.Query("code")
-	githubUser, err := getGitHubUserInfoByCode(code)
+	linuxdoUser, err := getLinuxDoUserInfoByCode(code)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -110,10 +116,10 @@ func GitHubOAuth(c *gin.Context) {
 		return
 	}
 	user := model.User{
-		GitHubId: githubUser.Login,
+		LinuxDoId: strconv.Itoa(linuxdoUser.ID),
 	}
-	if model.IsGitHubIdAlreadyTaken(user.GitHubId) {
-		err := user.FillUserByGitHubId()
+	if model.IsLinuxDoIdAlreadyTaken(user.LinuxDoId) {
+		err := user.FillUserByLinuxDoId()
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
@@ -123,15 +129,15 @@ func GitHubOAuth(c *gin.Context) {
 		}
 	} else {
 		if common.RegisterEnabled {
-			user.InviterId, _ = model.GetUserIdByAffCode(c.Query("aff"))
+			affCode := c.Query("aff")
+			user.InviterId, _ = model.GetUserIdByAffCode(affCode)
 
-			user.Username = "github_" + strconv.Itoa(model.GetMaxUserId()+1)
-			if githubUser.Name != "" {
-				user.DisplayName = githubUser.Name
+			user.Username = "linuxdo_" + strconv.Itoa(model.GetMaxUserId()+1)
+			if linuxdoUser.Name != "" {
+				user.DisplayName = linuxdoUser.Name
 			} else {
-				user.DisplayName = "GitHub User"
+				user.DisplayName = linuxdoUser.Username
 			}
-			user.Email = githubUser.Email
 			user.Role = common.RoleCommonUser
 			user.Status = common.UserStatusEnabled
 
@@ -161,16 +167,16 @@ func GitHubOAuth(c *gin.Context) {
 	setupLogin(&user, c)
 }
 
-func GitHubBind(c *gin.Context) {
-	if !common.GitHubOAuthEnabled {
+func LinuxDoBind(c *gin.Context) {
+	if !common.LinuxDoOAuthEnabled {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "管理员未开启通过 GitHub 登录以及注册",
+			"message": "管理员未开启通过 LINUX DO 登录以及注册",
 		})
 		return
 	}
 	code := c.Query("code")
-	githubUser, err := getGitHubUserInfoByCode(code)
+	linuxdoUser, err := getLinuxDoUserInfoByCode(code)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -179,12 +185,12 @@ func GitHubBind(c *gin.Context) {
 		return
 	}
 	user := model.User{
-		GitHubId: githubUser.Login,
+		LinuxDoId: strconv.Itoa(linuxdoUser.ID),
 	}
-	if model.IsGitHubIdAlreadyTaken(user.GitHubId) {
+	if model.IsLinuxDoIdAlreadyTaken(user.LinuxDoId) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
-			"message": "该 GitHub 账户已被绑定",
+			"message": "该 LINUX DO 账户已被绑定",
 		})
 		return
 	}
@@ -200,7 +206,7 @@ func GitHubBind(c *gin.Context) {
 		})
 		return
 	}
-	user.GitHubId = githubUser.Login
+	user.LinuxDoId = strconv.Itoa(linuxdoUser.ID)
 	err = user.Update(false)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -214,23 +220,4 @@ func GitHubBind(c *gin.Context) {
 		"message": "bind",
 	})
 	return
-}
-
-func GenerateOAuthCode(c *gin.Context) {
-	session := sessions.Default(c)
-	state := common.GetRandomString(12)
-	session.Set("oauth_state", state)
-	err := session.Save()
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"success": false,
-			"message": err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": "",
-		"data":    state,
-	})
 }

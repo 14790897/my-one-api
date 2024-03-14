@@ -3,7 +3,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import {API, copy, isRoot, showError, showInfo, showNotice, showSuccess} from '../helpers';
 import Turnstile from 'react-turnstile';
 import {UserContext} from '../context/User';
-import {onGitHubOAuthClicked} from './utils';
+import {onGitHubOAuthClicked, onLinuxDoOAuthClicked} from './utils';
 import {
     Avatar, Banner,
     Button,
@@ -438,6 +438,27 @@ const PersonalSetting = () => {
                                         >
                                             {
                                                 status.github_oauth?'绑定':'未启用'
+                                            }
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{marginTop: 10}}>
+                                <Typography.Text strong>LINUX DO</Typography.Text>
+                                <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                                    <div>
+                                        <Input
+                                            value={userState.user && userState.user.linuxdo_id !== '' ? userState.user.linuxdo_id : '未绑定'}
+                                            readonly={true}
+                                        ></Input>
+                                    </div>
+                                    <div>
+                                        <Button
+                                            onClick={() => {onLinuxDoOAuthClicked(status.linuxdo_client_id)}}
+                                            disabled={(userState.user && userState.user.linuxdo_id !== '') || !status.linuxdo_oauth}
+                                        >
+                                            {
+                                                status.linuxdo_oauth ? '绑定' : '未启用'
                                             }
                                         </Button>
                                     </div>

@@ -96,6 +96,10 @@ const Home = () => {
                       {statusState?.status?.github_oauth === true ? '已启用' : '未启用'}
                     </p>
                     <p>
+                      LINUX DO 身份验证：
+                      {statusState?.status?.linuxdo_oauth === true ? '已启用' : '未启用'}
+                    </p>
+                    <p>
                       微信身份验证：
                       {statusState?.status?.wechat_login === true ? '已启用' : '未启用'}
                     </p>

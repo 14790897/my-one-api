@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { API, showError, showSuccess } from '../helpers';
 import { UserContext } from '../context/User';
 
-const GitHubOAuth = () => {
+const LinuxDoOAuth = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [userState, userDispatch] = useContext(UserContext);
@@ -15,7 +15,7 @@ const GitHubOAuth = () => {
 
   const sendCode = async (code, state, count) => {
     let aff = localStorage.getItem('aff');
-    const res = await API.get(`/api/oauth/github?code=${code}&state=${state}&aff=${aff}`);
+    const res = await API.get(`/api/oauth/linuxdo?code=${code}&state=${state}&aff=${aff}`);
     const { success, message, data } = res.data;
     if (success) {
       if (message === 'bind') {
@@ -64,4 +64,4 @@ const GitHubOAuth = () => {
   );
 };
 
-export default GitHubOAuth;
+export default LinuxDoOAuth;
