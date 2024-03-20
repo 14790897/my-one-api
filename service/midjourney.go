@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"one-api/common"
 	"one-api/constant"
 	"one-api/dto"
 	relayconstant "one-api/relay/constant"
@@ -158,14 +159,19 @@ func DoMidjourneyHttpRequest(c *gin.Context, timeout time.Duration, fullRequestU
 	//requestBody = c.Request.Body
 	// read request body to json, delete accountFilter and notifyHook
 	var mapResult map[string]interface{}
-	err := json.NewDecoder(c.Request.Body).Decode(&mapResult)
-	if err != nil {
-		return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "read_request_body_failed", http.StatusInternalServerError), nullBytes, err
+	// if get request, no need to read request body
+	if c.Request.Method != "GET" {
+		err := json.NewDecoder(c.Request.Body).Decode(&mapResult)
+		if err != nil {
+			return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "read_request_body_failed", http.StatusInternalServerError), nullBytes, err
+		}
+		delete(mapResult, "accountFilter")
+		if !constant.MjNotifyEnabled {
+			delete(mapResult, "notifyHook")
+		}
+		//req, err := http.NewRequest(c.Request.Method, fullRequestURL, requestBody)
+		// make new request with mapResult
 	}
-	delete(mapResult, "accountFilter")
-	delete(mapResult, "notifyHook")
-	//req, err := http.NewRequest(c.Request.Method, fullRequestURL, requestBody)
-	// make new request with mapResult
 	reqBody, err := json.Marshal(mapResult)
 	if err != nil {
 		return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "marshal_request_body_failed", http.StatusInternalServerError), nullBytes, err
@@ -183,10 +189,11 @@ func DoMidjourneyHttpRequest(c *gin.Context, timeout time.Duration, fullRequestU
 	defer cancel()
 	resp, err := GetHttpClient().Do(req)
 	if err != nil {
+		common.SysError("do request failed: " + err.Error())
 		return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "do_request_failed", http.StatusInternalServerError), nullBytes, err
 	}
 	statusCode := resp.StatusCode
-	//if statusCode != 200 {
+	//if statusCode != 200  {
 	//	return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "bad_response_status_code", statusCode), nullBytes, nil
 	//}
 	err = req.Body.Close()
@@ -207,11 +214,15 @@ func DoMidjourneyHttpRequest(c *gin.Context, timeout time.Duration, fullRequestU
 	if err != nil {
 		return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "close_response_body_failed", statusCode), responseBody, err
 	}
-
-	err = json.Unmarshal(responseBody, &midjResponse)
-	log.Printf("responseBody: %s", string(responseBody))
-	if err != nil {
-		return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "unmarshal_response_body_failed", statusCode), responseBody, err
+	respStr := string(responseBody)
+	log.Printf("responseBody: %s", respStr)
+	if respStr == "" {
+		return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "empty_response_body", statusCode), responseBody, nil
+	} else {
+		err = json.Unmarshal(responseBody, &midjResponse)
+		if err != nil {
+			return MidjourneyErrorWithStatusCodeWrapper(constant.MjErrorUnknown, "unmarshal_response_body_failed", statusCode), responseBody, err
+		}
 	}
 	//log.Printf("midjResponse: %v", midjResponse)
 	//for k, v := range resp.Header {
