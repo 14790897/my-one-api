@@ -2,18 +2,17 @@ version: '3.4'
 
 services:
   new-api:
-    image: calciumion/new-api:latest
-    # build: .
+    image: pengzhile/new-api:latest
     container_name: new-api
     restart: always
     command: --log-dir /app/logs
     ports:
       - "3000:3000"
     volumes:
-      - ./data:/data
+      - ./data/new-api:/data
       - ./logs:/app/logs
     environment:
-      - SQL_DSN=root:123456@tcp(host.docker.internal:3306)/new-api  # 修改此行，或注释掉以使用 SQLite 作为数据库
+      - SQL_DSN=newapi:123456@tcp(db:3306)/new-api  # 修改此行，或注释掉以使用 SQLite 作为数据库
       - REDIS_CONN_STRING=redis://redis
       - SESSION_SECRET=random_string  # 修改为随机字符串
       - TZ=Asia/Shanghai
@@ -23,13 +22,22 @@ services:
 
     depends_on:
       - redis
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -q -O - http://localhost:3000/api/status | grep -o '\"success\":\\s*true' | awk -F: '{print $2}'" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - db
 
   redis:
     image: redis:latest
     container_name: redis
     restart: always
+
+  db:
+    image: mysql:8.2.0
+    container_name: mysql
+    restart: always
+    volumes:
+      - ./data/mysql:/var/lib/mysql  # 挂载目录，持久化存储
+    environment:
+      TZ: Asia/Shanghai   # 设置时区
+      MYSQL_ROOT_PASSWORD: 'OneAPI@justsong' # 设置 root 用户的密码
+      MYSQL_USER: newapi   # 创建专用用户
+      MYSQL_PASSWORD: '123456'    # 设置专用用户密码
+      MYSQL_DATABASE: new-api   # 自动创建数据库
