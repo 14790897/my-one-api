@@ -69,6 +69,7 @@ func InitOptionMap() {
 	common.OptionMap["GitHubClientSecret"] = ""
 	common.OptionMap["LinuxDoClientId"] = ""
 	common.OptionMap["LinuxDoClientSecret"] = ""
+	common.OptionMap["LinuxDoMinLevel"] = strconv.Itoa(common.LinuxDoMinLevel)
 	common.OptionMap["TelegramBotToken"] = ""
 	common.OptionMap["TelegramBotName"] = ""
 	common.OptionMap["WeChatServerAddress"] = ""
@@ -230,6 +231,8 @@ func updateOptionMap(key string, value string) (err error) {
 		common.LinuxDoClientId = value
 	case "LinuxDoClientSecret":
 		common.LinuxDoClientSecret = value
+	case "LinuxDoMinLevel":
+		common.LinuxDoMinLevel, _ = strconv.Atoi(value)
 	case "Footer":
 		common.Footer = value
 	case "SystemName":

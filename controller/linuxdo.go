@@ -80,6 +80,9 @@ func getLinuxDoUserInfoByCode(code string) (*LinuxDoUser, error) {
 	if linuxdoUser.ID == 0 {
 		return nil, errors.New("返回值非法，用户字段为空，请稍后重试！")
 	}
+	if linuxdoUser.TrustLevel < common.LinuxDoMinLevel {
+		return nil, errors.New("用户 LINUX DO 信任等级不足！")
+	}
 	return &linuxdoUser, nil
 }
 
@@ -116,10 +119,21 @@ func LinuxDoOAuth(c *gin.Context) {
 		return
 	}
 	user := model.User{
-		LinuxDoId: strconv.Itoa(linuxdoUser.ID),
+		LinuxDoId:    strconv.Itoa(linuxdoUser.ID),
+		LinuxDoLevel: linuxdoUser.TrustLevel,
 	}
 	if model.IsLinuxDoIdAlreadyTaken(user.LinuxDoId) {
 		err := user.FillUserByLinuxDoId()
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": err.Error(),
+			})
+			return
+		}
+
+		user.LinuxDoLevel = linuxdoUser.TrustLevel
+		err = user.Update(false)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
@@ -185,7 +199,8 @@ func LinuxDoBind(c *gin.Context) {
 		return
 	}
 	user := model.User{
-		LinuxDoId: strconv.Itoa(linuxdoUser.ID),
+		LinuxDoId:    strconv.Itoa(linuxdoUser.ID),
+		LinuxDoLevel: linuxdoUser.TrustLevel,
 	}
 	if model.IsLinuxDoIdAlreadyTaken(user.LinuxDoId) {
 		c.JSON(http.StatusOK, gin.H{
@@ -207,6 +222,7 @@ func LinuxDoBind(c *gin.Context) {
 		return
 	}
 	user.LinuxDoId = strconv.Itoa(linuxdoUser.ID)
+	user.LinuxDoLevel = linuxdoUser.TrustLevel
 	err = user.Update(false)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{

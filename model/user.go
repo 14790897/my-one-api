@@ -22,6 +22,7 @@ type User struct {
 	Email            string         `json:"email" gorm:"index" validate:"max=50"`
 	GitHubId         string         `json:"github_id" gorm:"column:github_id;index"`
 	LinuxDoId        string         `json:"linuxdo_id" gorm:"column:linuxdo_id;index"`
+	LinuxDoLevel     int            `json:"linuxdo_level" gorm:"column:linuxdo_level;type:int;default:0"`
 	WeChatId         string         `json:"wechat_id" gorm:"column:wechat_id;index"`
 	TelegramId       string         `json:"telegram_id" gorm:"column:telegram_id;index"`
 	VerificationCode string         `json:"verification_code" gorm:"-:all"`                                    // this field is only for Email verification, don't save it to database!
@@ -367,6 +368,18 @@ func IsUserEnabled(userId int) (bool, error) {
 		return false, err
 	}
 	return user.Status == common.UserStatusEnabled, nil
+}
+
+func IsLinuxDoEnabled(userId int) (bool, error) {
+	if userId == 0 {
+		return false, errors.New("user id is empty")
+	}
+	var user User
+	err := DB.Where("id = ?", userId).Select("linuxdo_id, linuxdo_level").Find(&user).Error
+	if err != nil {
+		return false, err
+	}
+	return user.LinuxDoId == "" || user.LinuxDoLevel >= common.LinuxDoMinLevel, nil
 }
 
 func ValidateAccessToken(token string) (user *User) {

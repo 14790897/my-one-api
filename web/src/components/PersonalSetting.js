@@ -454,7 +454,7 @@ const PersonalSetting = () => {
                 <div style={{display: 'flex', justifyContent: 'space-between'}}>
                   <div>
                     <Input
-                        value={userState.user && userState.user.linuxdo_id !== '' ? userState.user.linuxdo_id : '未绑定'}
+                        value={userState.user && userState.user.linuxdo_id !== '' ? userState.user.linuxdo_id + '（' + userState.user.linuxdo_level + '级）' : '未绑定'}
                         readonly={true}
                     ></Input>
                   </div>

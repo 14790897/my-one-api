@@ -204,6 +204,30 @@ func CacheIsUserEnabled(userId int) (bool, error) {
 	return userEnabled, err
 }
 
+func CacheIsLinuxDoEnabled(userId int) (bool, error) {
+	if !common.RedisEnabled {
+		return IsLinuxDoEnabled(userId)
+	}
+	enabled, err := common.RedisGet(fmt.Sprintf("linuxdo_enabled:%d", userId))
+	if err == nil {
+		return enabled == "1", nil
+	}
+
+	linuxDoEnabled, err := IsLinuxDoEnabled(userId)
+	if err != nil {
+		return false, err
+	}
+	enabled = "0"
+	if linuxDoEnabled {
+		enabled = "1"
+	}
+	err = common.RedisSet(fmt.Sprintf("linuxdo_enabled:%d", userId), enabled, time.Duration(UserId2StatusCacheSeconds)*time.Second)
+	if err != nil {
+		common.SysError("Redis set linuxdo enabled error: " + err.Error())
+	}
+	return linuxDoEnabled, err
+}
+
 var group2model2channels map[string]map[string][]*Channel
 var channelsIDM map[int]*Channel
 var channelSyncLock sync.RWMutex

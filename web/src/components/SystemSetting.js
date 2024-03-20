@@ -13,6 +13,7 @@ const SystemSetting = () => {
     LinuxDoOAuthEnabled: '',
     LinuxDoClientId: '',
     LinuxDoClientSecret: '',
+    LinuxDoMinLevel: 0,
     Notice: '',
     SMTPServer: '',
     SMTPPort: '',
@@ -135,6 +136,7 @@ const SystemSetting = () => {
       name === 'GitHubClientSecret' ||
       name === 'LinuxDoClientId' ||
       name === 'LinuxDoClientSecret' ||
+      name === 'LinuxDoMinLevel' ||
       name === 'WeChatServerAddress' ||
       name === 'WeChatServerToken' ||
       name === 'WeChatAccountQRCodeImageURL' ||
@@ -258,6 +260,9 @@ const SystemSetting = () => {
       inputs.LinuxDoClientSecret !== ''
     ) {
       await updateOption('LinuxDoClientSecret', inputs.LinuxDoClientSecret);
+    }
+    if (originInputs['LinuxDoMinLevel'] !== inputs.LinuxDoMinLevel) {
+      await updateOption('LinuxDoMinLevel', inputs.LinuxDoMinLevel);
     }
   };
 
@@ -633,6 +638,16 @@ const SystemSetting = () => {
               autoComplete='new-password'
               value={inputs.LinuxDoClientSecret}
               placeholder='敏感信息不会发送到前端显示'
+            />
+            <Form.Input
+                label='限制最低信任等级'
+                name='LinuxDoMinLevel'
+                onChange={handleInputChange}
+                type='number'
+                min={0}
+                max={4}
+                value={inputs.LinuxDoMinLevel}
+                placeholder='输入允许使用的最低 LINUX DO 信任等级'
             />
           </Form.Group>
           <Form.Button onClick={submitLinuxDoOAuth}>

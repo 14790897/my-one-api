@@ -85,6 +85,7 @@ var GitHubClientSecret = ""
 
 var LinuxDoClientId = ""
 var LinuxDoClientSecret = ""
+var LinuxDoMinLevel = 0
 
 var WeChatServerAddress = ""
 var WeChatServerToken = ""
