@@ -3,7 +3,7 @@ FROM node:16-slim as builder
 WORKDIR /build
 COPY web/package.json .
 COPY web/yarn.lock .
-RUN yarn install
+RUN yarn install --network-timeout 1000000
 COPY ./web .
 COPY ./VERSION .
 RUN DISABLE_ESLINT_PLUGIN='true' REACT_APP_VERSION=$(cat VERSION) yarn build

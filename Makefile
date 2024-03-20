@@ -7,7 +7,7 @@ all: build-frontend start-backend
 
 build-frontend:
 	@echo "Building frontend..."
-	@cd $(FRONTEND_DIR) && yarn install && DISABLE_ESLINT_PLUGIN='true' REACT_APP_VERSION=$(cat VERSION) yarn build
+	@cd $(FRONTEND_DIR) && yarn install --network-timeout 1000000 && DISABLE_ESLINT_PLUGIN='true' REACT_APP_VERSION=$(cat VERSION) yarn build
 
 start-backend:
 	@echo "Starting backend dev server..."
