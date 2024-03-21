@@ -516,7 +516,7 @@ func UpdateSelf(c *gin.Context) {
 	return
 }
 
-func DeleteUser(c *gin.Context) {
+func HardDeleteUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -525,7 +525,7 @@ func DeleteUser(c *gin.Context) {
 		})
 		return
 	}
-	originUser, err := model.GetUserById(id, false)
+	originUser, err := model.GetUserByIdUnscoped(id, false)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -549,6 +549,12 @@ func DeleteUser(c *gin.Context) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "",
+	})
+	return
 }
 
 func DeleteSelf(c *gin.Context) {

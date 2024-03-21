@@ -18,6 +18,8 @@ const GitHubOAuth = () => {
     const res = await API.get(`/api/oauth/github?code=${code}&state=${state}&aff=${aff}`);
     const { success, message, data } = res.data;
     if (success) {
+      localStorage.removeItem('aff');
+
       if (message === 'bind') {
         showSuccess('绑定成功！');
         navigate('/setting');

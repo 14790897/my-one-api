@@ -65,7 +65,7 @@ func CheckUserExistOrDeleted(username string, email string) (bool, error) {
 
 func GetMaxUserId() int {
 	var user User
-	DB.Last(&user)
+	DB.Unscoped().Last(&user)
 	return user.Id
 }
 
@@ -89,6 +89,20 @@ func GetUserById(id int, selectAll bool) (*User, error) {
 		err = DB.First(&user, "id = ?", id).Error
 	} else {
 		err = DB.Omit("password").First(&user, "id = ?", id).Error
+	}
+	return &user, err
+}
+
+func GetUserByIdUnscoped(id int, selectAll bool) (*User, error) {
+	if id == 0 {
+		return nil, errors.New("id 为空！")
+	}
+	user := User{Id: id}
+	var err error = nil
+	if selectAll {
+		err = DB.Unscoped().First(&user, "id = ?", id).Error
+	} else {
+		err = DB.Unscoped().Omit("password").First(&user, "id = ?", id).Error
 	}
 	return &user, err
 }
