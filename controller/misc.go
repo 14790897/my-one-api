@@ -33,6 +33,7 @@ func GetStatus(c *gin.Context) {
 		"success": true,
 		"message": "",
 		"data": gin.H{
+			"version":                  common.Version,
 			"start_time":               common.StartTime,
 			"email_verification":       common.EmailVerificationEnabled,
 			"github_oauth":             common.GitHubOAuthEnabled,
@@ -63,7 +64,6 @@ func GetStatus(c *gin.Context) {
 			"default_collapse_sidebar": common.DefaultCollapseSidebar,
 			"payment_enabled":          common.PaymentEnabled,
 			"mj_notify_enabled":        constant.MjNotifyEnabled,
-			"version":                  common.Version,
 		},
 	})
 	return
