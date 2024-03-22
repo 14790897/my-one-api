@@ -11,12 +11,12 @@ import (
 
 // Pay Settings
 
-var PayAddress = ""
-var CustomCallbackAddress = ""
-var EpayId = ""
-var EpayKey = ""
-var Price = 7.3
-var MinTopUp = 1
+var StripeApiSecret = ""
+var StripeWebhookSecret = ""
+var StripePriceId = ""
+var PaymentEnabled = false
+var StripeUnitPrice = 8.0
+var MinTopUp = 5
 
 var StartTime = time.Now().Unix() // unit: second
 var Version = "v0.0.0"            // this hard coding will be replaced automatically when building, no need to manually change
@@ -186,6 +186,12 @@ const (
 	ChannelStatusEnabled          = 1 // don't use 0, 0 is the default value!
 	ChannelStatusManuallyDisabled = 2 // also don't use 0
 	ChannelStatusAutoDisabled     = 3
+)
+
+const (
+	TopUpStatusPending = "pending"
+	TopUpStatusSuccess = "success"
+	TopUpStatusExpired = "expired"
 )
 
 const (

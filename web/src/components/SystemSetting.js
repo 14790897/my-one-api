@@ -21,13 +21,13 @@ const SystemSetting = () => {
     SMTPFrom: '',
     SMTPToken: '',
     ServerAddress: '',
-    EpayId: '',
-    EpayKey: '',
-    Price: 7.3,
-    MinTopUp: 1,
+    StripeApiSecret: '',
+    StripeWebhookSecret: '',
+    StripePriceId: '',
+    PaymentEnabled: false,
+    StripeUnitPrice: 8.0,
+    MinTopUp: 5,
     TopupGroupRatio: '',
-    PayAddress: '',
-    CustomCallbackAddress: '',
     Footer: '',
     WeChatAuthEnabled: '',
     WeChatServerAddress: '',
@@ -92,6 +92,7 @@ const SystemSetting = () => {
       case 'TurnstileCheckEnabled':
       case 'EmailDomainRestrictionEnabled':
       case 'RegisterEnabled':
+      case 'PaymentEnabled':
         value = inputs[key] === 'true' ? 'false' : 'true';
         break;
       default:
@@ -105,9 +106,6 @@ const SystemSetting = () => {
     if (success) {
       if (key === 'EmailDomainWhitelist') {
         value = value.split(',');
-      }
-      if (key === 'Price') {
-        value = parseFloat(value);
       }
       setInputs((inputs) => ({
         ...inputs, [key]: value
@@ -128,10 +126,11 @@ const SystemSetting = () => {
       name === 'Notice' ||
       name.startsWith('SMTP') ||
       name === 'ServerAddress' ||
-      name === 'EpayId' ||
-      name === 'EpayKey' ||
-      name === 'Price' ||
-      name === 'PayAddress' ||
+      name === 'StripeApiSecret' ||
+      name === 'StripeWebhookSecret' ||
+      name === 'StripePriceId' ||
+      name === 'StripeUnitPrice' ||
+      name === 'MinTopUp' ||
       name === 'GitHubClientId' ||
       name === 'GitHubClientSecret' ||
       name === 'LinuxDoClientId' ||
@@ -158,7 +157,7 @@ const SystemSetting = () => {
     await updateOption('ServerAddress', ServerAddress);
   };
 
-  const submitPayAddress = async () => {
+  const submitPaymentConfig = async () => {
     if (inputs.ServerAddress === '') {
       showError('请先填写服务器地址');
       return;
@@ -170,15 +169,30 @@ const SystemSetting = () => {
       }
       await updateOption('TopupGroupRatio', inputs.TopupGroupRatio);
     }
-    let PayAddress = removeTrailingSlash(inputs.PayAddress);
-    await updateOption('PayAddress', PayAddress);
-    if (inputs.EpayId !== '') {
-      await updateOption('EpayId', inputs.EpayId);
+    let stripeApiSecret = removeTrailingSlash(inputs.StripeApiSecret);
+    if (stripeApiSecret && !stripeApiSecret.startsWith("sk_")) {
+      showError('输入了无效的Stripe API密钥');
+      return;
     }
-    if (inputs.EpayKey !== '') {
-      await updateOption('EpayKey', inputs.EpayKey);
+    stripeApiSecret && await updateOption('StripeApiSecret', stripeApiSecret);
+
+    let stripeWebhookSecret = removeTrailingSlash(inputs.StripeWebhookSecret);
+    if (stripeWebhookSecret && !stripeWebhookSecret.startsWith("whsec_")) {
+      showError('输入了无效的Stripe Webhook签名密钥');
+      return;
     }
-    await updateOption('Price', '' + inputs.Price);
+    stripeWebhookSecret && await updateOption('StripeWebhookSecret', stripeWebhookSecret);
+
+    let stripePriceId = removeTrailingSlash(inputs.StripePriceId);
+    if (stripePriceId && !stripePriceId.startsWith("price_")) {
+      showError('输入了无效的Stripe 物品价格ID');
+      return;
+    }
+    await updateOption('StripePriceId', stripePriceId);
+
+    await updateOption('PaymentEnable', inputs.PaymentEnabled);
+    await updateOption('StripeUnitPrice', inputs.StripeUnitPrice);
+    await updateOption('MinTopUp', inputs.MinTopUp);
   };
 
   const submitSMTP = async () => {
@@ -318,54 +332,66 @@ const SystemSetting = () => {
             更新服务器地址
           </Form.Button>
           <Divider />
-          <Header as="h3">支付设置（当前仅支持易支付接口，默认使用上方服务器地址作为回调地址！）</Header>
+          <Header as="h3">
+            支付设置（当前仅支持Stripe Checkout）
+            <Header.Subheader>
+              密钥、Webhook 等设置请
+              <a href="https://dashboard.stripe.com/developers" target="_blank" rel="noreferrer">
+                点击此处
+              </a>
+              进行设置，最好先在
+              <a href="https://dashboard.stripe.com/test/developers" target="_blank" rel="noreferrer">
+                测试环境
+              </a>
+              进行测试
+            </Header.Subheader>
+          </Header>
+          <Message>
+            Webhook 填：
+            <code>{`${inputs.ServerAddress}/api/stripe/webhook`}</code>
+            ，需要包含事件：<code>checkout.session.completed</code> 和 <code>checkout.session.expired</code>
+          </Message>
           <Form.Group widths="equal">
             <Form.Input
-              label="支付地址，不填写则不启用在线支付"
-              placeholder="例如：https://yourdomain.com"
-              value={inputs.PayAddress}
-              name="PayAddress"
+              label="API密钥"
+              placeholder="sk_xxx的Stripe密钥，敏感信息不显示"
+              value={inputs.StripeApiSecret}
+              name="StripeApiSecret"
               onChange={handleInputChange}
             />
             <Form.Input
-              label="易支付商户ID"
-              placeholder="例如：0001"
-              value={inputs.EpayId}
-              name="EpayId"
+              label="Webhook签名密钥"
+              placeholder="whsec_xxx的Webhook签名密钥，敏感信息不显示"
+              value={inputs.StripeWebhookSecret}
+              name="StripeWebhookSecret"
               onChange={handleInputChange}
             />
             <Form.Input
-              label="易支付商户密钥"
-              placeholder="例如：dejhfueqhujasjmndbjkqaw"
-              value={inputs.EpayKey}
-              name="EpayKey"
+              label="商品价格ID"
+              placeholder="price_xxx的商品价格ID，新建产品后可获得"
+              value={inputs.StripePriceId}
+              name="StripePriceId"
               onChange={handleInputChange}
             />
-
           </Form.Group>
           <Form.Group widths="equal">
             <Form.Input
-              label="回调地址，不填写则使用上方服务器地址作为回调地址"
-              placeholder="例如：https://yourdomain.com"
-              value={inputs.CustomCallbackAddress}
-              name="CustomCallbackAddress"
-              onChange={handleInputChange}
+                label="商品单价（元）"
+                placeholder="商品的人民币价格"
+                value={inputs.StripeUnitPrice}
+                name="StripeUnitPrice"
+                type={"number"}
+                min={0}
+                onChange={handleInputChange}
             />
             <Form.Input
-              label="充值价格（x元/美金）"
-              placeholder="例如：7，就是7元/美金"
-              value={inputs.Price}
-              name="Price"
-              min={0}
-              onChange={handleInputChange}
-            />
-            <Form.Input
-              label="最低充值数量"
-              placeholder="例如：2，就是最低充值2$"
-              value={inputs.MinTopUp}
-              name="MinTopUp"
-              min={1}
-              onChange={handleInputChange}
+                label="最低充值数量"
+                placeholder="例如：2，就是最低充值2件商品"
+                value={inputs.MinTopUp}
+                name="MinTopUp"
+                type={"number"}
+                min={1}
+                onChange={handleInputChange}
             />
           </Form.Group>
           <Form.Group widths="equal">
@@ -379,9 +405,17 @@ const SystemSetting = () => {
               placeholder="为一个 JSON 文本，键为组名称，值为倍率"
             />
           </Form.Group>
-          <Form.Button onClick={submitPayAddress}>
-            更新支付设置
-          </Form.Button>
+          <Form.Group inline>
+            <Form.Button onClick={submitPaymentConfig}>
+              更新支付设置
+            </Form.Button>
+            <Form.Checkbox
+              checked={inputs.PaymentEnabled === 'true'}
+              label="开启在线支付"
+              name="PaymentEnabled"
+              onChange={handleInputChange}
+            />
+          </Form.Group>
           <Divider />
           <Header as="h3">配置登录注册</Header>
           <Form.Group inline>

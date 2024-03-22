@@ -58,11 +58,11 @@ func InitOptionMap() {
 	common.OptionMap["SystemName"] = common.SystemName
 	common.OptionMap["Logo"] = common.Logo
 	common.OptionMap["ServerAddress"] = ""
-	common.OptionMap["PayAddress"] = ""
-	common.OptionMap["CustomCallbackAddress"] = ""
-	common.OptionMap["EpayId"] = ""
-	common.OptionMap["EpayKey"] = ""
-	common.OptionMap["Price"] = strconv.FormatFloat(common.Price, 'f', -1, 64)
+	common.OptionMap["StripeApiSecret"] = common.StripeApiSecret
+	common.OptionMap["StripeWebhookSecret"] = common.StripeWebhookSecret
+	common.OptionMap["StripePriceId"] = common.StripePriceId
+	common.OptionMap["PaymentEnabled"] = strconv.FormatBool(common.PaymentEnabled)
+	common.OptionMap["StripeUnitPrice"] = strconv.FormatFloat(common.StripeUnitPrice, 'f', -1, 64)
 	common.OptionMap["MinTopUp"] = strconv.Itoa(common.MinTopUp)
 	common.OptionMap["TopupGroupRatio"] = common.TopupGroupRatio2JSONString()
 	common.OptionMap["GitHubClientId"] = ""
@@ -223,16 +223,16 @@ func updateOptionMap(key string, value string) (err error) {
 		common.SMTPToken = value
 	case "ServerAddress":
 		common.ServerAddress = value
-	case "PayAddress":
-		common.PayAddress = value
-	case "CustomCallbackAddress":
-		common.CustomCallbackAddress = value
-	case "EpayId":
-		common.EpayId = value
-	case "EpayKey":
-		common.EpayKey = value
-	case "Price":
-		common.Price, _ = strconv.ParseFloat(value, 64)
+	case "StripeApiSecret":
+		common.StripeApiSecret = value
+	case "StripeWebhookSecret":
+		common.StripeWebhookSecret = value
+	case "StripePriceId":
+		common.StripePriceId = value
+	case "PaymentEnabled":
+		common.PaymentEnabled, _ = strconv.ParseBool(value)
+	case "StripeUnitPrice":
+		common.StripeUnitPrice, _ = strconv.ParseFloat(value, 64)
 	case "MinTopUp":
 		common.MinTopUp, _ = strconv.Atoi(value)
 	case "TopupGroupRatio":

@@ -98,3 +98,11 @@ func LogQuota(quota int) string {
 		return fmt.Sprintf("%d 点额度", quota)
 	}
 }
+
+func LogQuotaF(quota float64) string {
+	if DisplayInCurrencyEnabled {
+		return fmt.Sprintf("＄%.6f 额度", quota/QuotaPerUnit)
+	} else {
+		return fmt.Sprintf("%d 点额度", int64(quota))
+	}
+}

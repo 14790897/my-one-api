@@ -31,13 +31,14 @@ func SetApiRouter(router *gin.Engine) {
 		apiRouter.GET("/oauth/telegram/login", middleware.CriticalRateLimit(), controller.TelegramLogin)
 		apiRouter.GET("/oauth/telegram/bind", middleware.CriticalRateLimit(), middleware.UserAuth(), controller.TelegramBind)
 
+		apiRouter.POST("/stripe/webhook", controller.StripeWebhook)
+
 		userRoute := apiRouter.Group("/user")
 		{
 			userRoute.POST("/register", middleware.CriticalRateLimit(), middleware.TurnstileCheck(), controller.Register)
 			userRoute.POST("/login", middleware.CriticalRateLimit(), middleware.TurnstileCheck(), controller.Login)
 			//userRoute.POST("/tokenlog", middleware.CriticalRateLimit(), controller.TokenLog)
 			userRoute.GET("/logout", controller.Logout)
-			userRoute.GET("/epay/notify", controller.EpayNotify)
 
 			selfRoute := userRoute.Group("/")
 			selfRoute.Use(middleware.UserAuth())
@@ -48,8 +49,8 @@ func SetApiRouter(router *gin.Engine) {
 				selfRoute.DELETE("/self", controller.DeleteSelf)
 				selfRoute.GET("/token", controller.GenerateAccessToken)
 				selfRoute.GET("/aff", controller.GetAffCode)
-				selfRoute.POST("/topup", controller.TopUp)
-				selfRoute.POST("/pay", controller.RequestEpay)
+				selfRoute.POST("/topup", middleware.CriticalRateLimit(), controller.TopUp)
+				selfRoute.POST("/pay", middleware.CriticalRateLimit(), controller.RequestPayLink)
 				selfRoute.POST("/amount", controller.RequestAmount)
 				selfRoute.POST("/aff_transfer", controller.TransferAffQuota)
 			}
