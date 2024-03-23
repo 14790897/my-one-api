@@ -262,7 +262,7 @@ const TopUp = () => {
                                             }}
                                         />
                                         <Space>
-                                            <Button style={{backgroundColor: '#2e75cd'}}
+                                            <Button style={{backgroundColor: '#b161fe'}}
                                                     type={'primary'}
                                                     disabled={isPaying}
                                                     theme={'solid'} onClick={

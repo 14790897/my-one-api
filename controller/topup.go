@@ -25,7 +25,7 @@ type AmountRequest struct {
 	TopUpCode string `json:"top_up_code"`
 }
 
-func genStripeLink(referenceId string, amount int64) (string, error) {
+func genStripeLink(referenceId string, customerId string, email string, amount int64) (string, error) {
 	if !strings.HasPrefix(common.StripeApiSecret, "sk_") {
 		return "", fmt.Errorf("无效的Stripe API密钥")
 	}
@@ -44,6 +44,17 @@ func genStripeLink(referenceId string, amount int64) (string, error) {
 		},
 		Mode: stripe.String(string(stripe.CheckoutSessionModePayment)),
 	}
+
+	if "" == customerId {
+		if "" != email {
+			params.CustomerEmail = stripe.String(email)
+		}
+
+		params.CustomerCreation = stripe.String(string(stripe.CheckoutSessionCustomerCreationAlways))
+	} else {
+		params.Customer = stripe.String(customerId)
+	}
+
 	result, err := session.New(params)
 	if err != nil {
 		return "", err
@@ -96,7 +107,7 @@ func RequestPayLink(c *gin.Context) {
 	reference := fmt.Sprintf("new-api-ref-%d-%d-%s", user.Id, time.Now().UnixMilli(), common.RandomString(4))
 	referenceId := "ref_" + common.Sha1(reference)
 
-	payLink, err := genStripeLink(referenceId, int64(req.Amount))
+	payLink, err := genStripeLink(referenceId, user.StripeCustomer, user.Email, int64(req.Amount))
 	if err != nil {
 		log.Println("获取Stripe Checkout支付链接失败", err)
 		c.JSON(200, gin.H{"message": "error", "data": "拉起支付失败"})

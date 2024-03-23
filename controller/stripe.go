@@ -44,6 +44,7 @@ func StripeWebhook(c *gin.Context) {
 }
 
 func sessionCompleted(event stripe.Event) {
+	customerId := event.GetObjectValue("customer")
 	referenceId := event.GetObjectValue("client_reference_id")
 	status := event.GetObjectValue("status")
 	if "complete" != status {
@@ -51,7 +52,7 @@ func sessionCompleted(event stripe.Event) {
 		return
 	}
 
-	err := model.Recharge(referenceId)
+	err := model.Recharge(referenceId, customerId)
 	if err != nil {
 		log.Println(err.Error(), referenceId)
 		return
