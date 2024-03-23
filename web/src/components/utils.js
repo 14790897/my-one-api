@@ -14,7 +14,7 @@ export async function getOAuthState() {
 export async function onGitHubOAuthClicked(github_client_id) {
   const state = await getOAuthState();
   if (!state) return;
-  location.href = `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`
+  location.href = `https://github.com/login/oauth/authorize?client_id=${github_client_id}&state=${state}&scope=user:email`;
 }
 
 export async function onLinuxDoOAuthClicked(linuxdo_client_id) {

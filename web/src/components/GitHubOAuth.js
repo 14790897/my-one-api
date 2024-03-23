@@ -15,7 +15,9 @@ const GitHubOAuth = () => {
 
   const sendCode = async (code, state, count) => {
     let aff = localStorage.getItem('aff');
-    const res = await API.get(`/api/oauth/github?code=${code}&state=${state}&aff=${aff}`);
+    const res = await API.get(
+      `/api/oauth/github?code=${code}&state=${state}&aff=${aff}`,
+    );
     const { success, message, data } = res.data;
     if (success) {
       localStorage.removeItem('aff');
@@ -60,7 +62,7 @@ const GitHubOAuth = () => {
   return (
     <Segment style={{ minHeight: '300px' }}>
       <Dimmer active inverted>
-        <Loader size="large">{prompt}</Loader>
+        <Loader size='large'>{prompt}</Loader>
       </Dimmer>
     </Segment>
   );

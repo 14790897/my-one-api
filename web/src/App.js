@@ -11,7 +11,7 @@ import EditUser from './pages/User/EditUser';
 import { getLogo, getSystemName } from './helpers';
 import PasswordResetForm from './components/PasswordResetForm';
 import GitHubOAuth from './components/GitHubOAuth';
-import LinuxDoOAuth from "./components/LinuxDoOAuth";
+import LinuxDoOAuth from './components/LinuxDoOAuth';
 import PasswordResetConfirm from './components/PasswordResetConfirm';
 import { UserContext } from './context/User';
 import Channel from './pages/Channel';
@@ -23,9 +23,10 @@ import Log from './pages/Log';
 import Chat from './pages/Chat';
 import { Layout } from '@douyinfe/semi-ui';
 import Midjourney from './pages/Midjourney';
-import Detail from './pages/Detail';
+// import Detail from './pages/Detail';
 
 const Home = lazy(() => import('./pages/Home'));
+const Detail = lazy(() => import('./pages/Detail'));
 const About = lazy(() => import('./pages/About'));
 
 function App() {
@@ -48,7 +49,7 @@ function App() {
     }
     let logo = getLogo();
     if (logo) {
-      let linkElement = document.querySelector('link[rel~=\'icon\']');
+      let linkElement = document.querySelector("link[rel~='icon']");
       if (linkElement) {
         linkElement.href = logo;
       }
@@ -60,7 +61,7 @@ function App() {
       <Layout.Content>
         <Routes>
           <Route
-            path="/"
+            path='/'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <Home />
@@ -68,7 +69,7 @@ function App() {
             }
           />
           <Route
-            path="/channel"
+            path='/channel'
             element={
               <PrivateRoute>
                 <Channel />
@@ -76,7 +77,7 @@ function App() {
             }
           />
           <Route
-            path="/channel/edit/:id"
+            path='/channel/edit/:id'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <EditChannel />
@@ -84,7 +85,7 @@ function App() {
             }
           />
           <Route
-            path="/channel/add"
+            path='/channel/add'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <EditChannel />
@@ -92,7 +93,7 @@ function App() {
             }
           />
           <Route
-            path="/token"
+            path='/token'
             element={
               <PrivateRoute>
                 <Token />
@@ -100,7 +101,7 @@ function App() {
             }
           />
           <Route
-            path="/redemption"
+            path='/redemption'
             element={
               <PrivateRoute>
                 <Redemption />
@@ -108,7 +109,7 @@ function App() {
             }
           />
           <Route
-            path="/user"
+            path='/user'
             element={
               <PrivateRoute>
                 <User />
@@ -116,7 +117,7 @@ function App() {
             }
           />
           <Route
-            path="/user/edit/:id"
+            path='/user/edit/:id'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <EditUser />
@@ -124,7 +125,7 @@ function App() {
             }
           />
           <Route
-            path="/user/edit"
+            path='/user/edit'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <EditUser />
@@ -132,7 +133,7 @@ function App() {
             }
           />
           <Route
-            path="/user/reset"
+            path='/user/reset'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <PasswordResetConfirm />
@@ -140,7 +141,7 @@ function App() {
             }
           />
           <Route
-            path="/login"
+            path='/login'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <LoginForm />
@@ -148,7 +149,7 @@ function App() {
             }
           />
           <Route
-            path="/register"
+            path='/register'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <RegisterForm />
@@ -156,7 +157,7 @@ function App() {
             }
           />
           <Route
-            path="/reset"
+            path='/reset'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <PasswordResetForm />
@@ -164,7 +165,7 @@ function App() {
             }
           />
           <Route
-            path="/oauth/github"
+            path='/oauth/github'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <GitHubOAuth />
@@ -172,7 +173,7 @@ function App() {
             }
           />
           <Route
-            path="/oauth/linuxdo"
+            path='/oauth/linuxdo'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <LinuxDoOAuth />
@@ -180,7 +181,7 @@ function App() {
             }
           />
           <Route
-            path="/setting"
+            path='/setting'
             element={
               <PrivateRoute>
                 <Suspense fallback={<Loading></Loading>}>
@@ -190,7 +191,7 @@ function App() {
             }
           />
           <Route
-            path="/topup"
+            path='/topup'
             element={
               <PrivateRoute>
                 <Suspense fallback={<Loading></Loading>}>
@@ -200,7 +201,7 @@ function App() {
             }
           />
           <Route
-            path="/log"
+            path='/log'
             element={
               <PrivateRoute>
                 <Log />
@@ -208,23 +209,27 @@ function App() {
             }
           />
           <Route
-            path="/detail"
+            path='/detail'
             element={
               <PrivateRoute>
-                <Detail />
+                <Suspense fallback={<Loading></Loading>}>
+                  <Detail />
+                </Suspense>
               </PrivateRoute>
             }
           />
           <Route
-            path="/midjourney"
+            path='/midjourney'
             element={
               <PrivateRoute>
-                <Midjourney />
+                <Suspense fallback={<Loading></Loading>}>
+                  <Midjourney />
+                </Suspense>
               </PrivateRoute>
             }
           />
           <Route
-            path="/about"
+            path='/about'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <About />
@@ -232,16 +237,14 @@ function App() {
             }
           />
           <Route
-            path="/chat"
+            path='/chat'
             element={
               <Suspense fallback={<Loading></Loading>}>
                 <Chat />
               </Suspense>
             }
           />
-          <Route path="*" element={
-            <NotFound />
-          } />
+          <Route path='*' element={<NotFound />} />
         </Routes>
       </Layout.Content>
     </Layout>
