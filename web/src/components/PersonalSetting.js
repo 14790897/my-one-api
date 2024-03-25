@@ -628,7 +628,7 @@ const PersonalSetting = () => {
                   onCancel={() => setShowWeChatBindModal(false)}
                   // onOpen={() => setShowWeChatBindModal(true)}
                   visible={showWeChatBindModal}
-                  size={'mini'}
+                  size={'small'}
                 >
                   <Image src={status.wechat_qrcode} />
                   <div style={{ textAlign: 'center' }}>
@@ -678,7 +678,7 @@ const PersonalSetting = () => {
                   onClick={sendVerificationCode}
                   disabled={disableButton || loading}
                 >
-                  {disableButton ? `重新发送(${countdown})` : '获取验证码'}
+                  {disableButton ? `重新发送 (${countdown})` : '获取验证码'}
                 </Button>
               </div>
               <div style={{ marginTop: 10 }}>
