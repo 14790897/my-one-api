@@ -312,7 +312,7 @@ const LogsTable = () => {
   const [loading, setLoading] = useState(false);
   const [loadingStat, setLoadingStat] = useState(false);
   const [activePage, setActivePage] = useState(1);
-  const [logCount, setLogCount] = useState(ITEMS_PER_PAGE);
+  const [logCount, setLogCount] = useState(0);
   const [pageSize, setPageSize] = useState(ITEMS_PER_PAGE);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searching, setSearching] = useState(false);
@@ -409,14 +409,14 @@ const LogsTable = () => {
     }
   };
 
-  const setLogsFormat = (logs) => {
+  const setLogsFormat = (logs, total) => {
     for (let i = 0; i < logs.length; i++) {
       logs[i].timestamp2string = timestamp2string(logs[i].created_at);
       logs[i].key = '' + logs[i].id;
     }
     // data.key = '' + data.id
     setLogs(logs);
-    setLogCount(logs.length + ITEMS_PER_PAGE);
+    setLogCount(total);
     // console.log(logCount);
   };
 
@@ -432,14 +432,14 @@ const LogsTable = () => {
       url = `/api/log/self/?p=${startIdx}&page_size=${pageSize}&type=${logType}&token_name=${token_name}&model_name=${model_name}&start_timestamp=${localStartTimestamp}&end_timestamp=${localEndTimestamp}`;
     }
     const res = await API.get(url);
-    const { success, message, data } = res.data;
+    const { success, message, total, data } = res.data;
     if (success) {
       if (startIdx === 0) {
-        setLogsFormat(data);
+        setLogsFormat(data, total);
       } else {
         let newLogs = [...logs];
         newLogs.splice(startIdx * pageSize, data.length, ...data);
-        setLogsFormat(newLogs);
+        setLogsFormat(newLogs, total);
       }
     } else {
       showError(message);
@@ -606,7 +606,9 @@ const LogsTable = () => {
                 type='primary'
                 htmlType='submit'
                 className='btn-margin-right'
-                onClick={refresh}
+                onClick={() => {
+                  refresh(logType).then();
+                }}
                 loading={loading}
               >
                 查询
