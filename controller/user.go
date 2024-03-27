@@ -558,6 +558,14 @@ func HardDeleteUser(c *gin.Context) {
 }
 
 func DeleteSelf(c *gin.Context) {
+	if !common.UserSelfDeletionEnabled {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "当前设置不允许用户自我删除账号",
+		})
+		return
+	}
+
 	id := c.GetInt("id")
 	user, _ := model.GetUserById(id, false)
 

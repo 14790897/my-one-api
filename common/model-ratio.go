@@ -71,8 +71,11 @@ var DefaultModelRatio = map[string]float64{
 	"ERNIE-Bot-4":               8.572,  // ￥0.12 / 1k tokens
 	"Embedding-V1":              0.1429, // ￥0.002 / 1k tokens
 	"PaLM-2":                    1,
-	"gemini-pro":                1,      // $0.00025 / 1k characters -> $0.001 / 1k tokens
-	"gemini-pro-vision":         1,      // $0.00025 / 1k characters -> $0.001 / 1k tokens
+	"gemini-pro":                1, // $0.00025 / 1k characters -> $0.001 / 1k tokens
+	"gemini-pro-vision":         1, // $0.00025 / 1k characters -> $0.001 / 1k tokens
+	"gemini-1.0-pro-vision-001": 1,
+	"gemini-1.0-pro-001":        1,
+	"gemini-1.5-pro":            1,
 	"chatglm_turbo":             0.3572, // ￥0.005 / 1k tokens
 	"chatglm_pro":               0.7143, // ￥0.01 / 1k tokens
 	"chatglm_std":               0.3572, // ￥0.005 / 1k tokens
@@ -211,6 +214,16 @@ func GetCompletionRatio(name string) float64 {
 		return 3
 	} else if strings.HasPrefix(name, "claude-3") {
 		return 5
+	}
+	if strings.HasPrefix(name, "mistral-") {
+		return 3
+	}
+	if strings.HasPrefix(name, "gemini-") {
+		return 3
+	}
+	switch name {
+	case "llama2-70b-4096":
+		return 0.8 / 0.7
 	}
 	return 1
 }

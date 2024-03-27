@@ -45,6 +45,7 @@ const SystemSetting = () => {
     TurnstileSiteKey: '',
     TurnstileSecretKey: '',
     RegisterEnabled: '',
+    UserSelfDeletionEnabled: false,
     EmailDomainRestrictionEnabled: '',
     EmailDomainWhitelist: [],
     // telegram login
@@ -104,6 +105,7 @@ const SystemSetting = () => {
       case 'TurnstileCheckEnabled':
       case 'EmailDomainRestrictionEnabled':
       case 'RegisterEnabled':
+      case 'UserSelfDeletionEnabled':
       case 'PaymentEnabled':
         value = inputs[key] === 'true' ? 'false' : 'true';
         break;
@@ -535,6 +537,12 @@ const SystemSetting = () => {
               label='启用 Turnstile 用户校验'
               name='TurnstileCheckEnabled'
               onChange={handleInputChange}
+            />
+            <Form.Checkbox
+                checked={inputs.UserSelfDeletionEnabled === 'true'}
+                label='允许用户自行删除账户'
+                name='UserSelfDeletionEnabled'
+                onChange={handleInputChange}
             />
           </Form.Group>
           <Divider />
