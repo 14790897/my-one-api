@@ -541,10 +541,10 @@ const SystemSetting = () => {
               onChange={handleInputChange}
             />
             <Form.Checkbox
-                checked={inputs.UserSelfDeletionEnabled === 'true'}
-                label='允许用户自行删除账户'
-                name='UserSelfDeletionEnabled'
-                onChange={handleInputChange}
+              checked={inputs.UserSelfDeletionEnabled === 'true'}
+              label='允许用户自行删除账户'
+              name='UserSelfDeletionEnabled'
+              onChange={handleInputChange}
             />
           </Form.Group>
           <Divider />
