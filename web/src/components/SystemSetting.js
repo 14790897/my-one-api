@@ -47,6 +47,7 @@ const SystemSetting = () => {
     RegisterEnabled: '',
     UserSelfDeletionEnabled: false,
     EmailDomainRestrictionEnabled: '',
+    SMTPSSLEnabled: '',
     EmailDomainWhitelist: [],
     // telegram login
     TelegramOAuthEnabled: '',
@@ -104,6 +105,7 @@ const SystemSetting = () => {
       case 'TelegramOAuthEnabled':
       case 'TurnstileCheckEnabled':
       case 'EmailDomainRestrictionEnabled':
+      case 'SMTPSSLEnabled':
       case 'RegisterEnabled':
       case 'UserSelfDeletionEnabled':
       case 'PaymentEnabled':
@@ -139,7 +141,7 @@ const SystemSetting = () => {
     }
     if (
       name === 'Notice' ||
-      name.startsWith('SMTP') ||
+      (name.startsWith('SMTP') && name !== 'SMTPSSLEnabled') ||
       name === 'ServerAddress' ||
       name === 'StripeApiSecret' ||
       name === 'StripeWebhookSecret' ||
@@ -650,6 +652,14 @@ const SystemSetting = () => {
               autoComplete='new-password'
               checked={inputs.RegisterEnabled === 'true'}
               placeholder='敏感信息不会发送到前端显示'
+            />
+          </Form.Group>
+          <Form.Group widths={3}>
+            <Form.Checkbox
+              label='启用SMTP SSL（465端口强制开启）'
+              name='SMTPSSLEnabled'
+              onChange={handleInputChange}
+              checked={inputs.SMTPSSLEnabled === 'true'}
             />
           </Form.Group>
           <Form.Button onClick={submitSMTP}>保存 SMTP 设置</Form.Button>

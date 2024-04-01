@@ -77,6 +77,7 @@ var LogConsumeEnabled = true
 
 var SMTPServer = ""
 var SMTPPort = 587
+var SMTPSSLEnabled = false
 var SMTPAccount = ""
 var SMTPFrom = ""
 var SMTPToken = ""

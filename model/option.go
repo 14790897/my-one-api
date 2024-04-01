@@ -52,6 +52,7 @@ func InitOptionMap() {
 	common.OptionMap["SMTPPort"] = strconv.Itoa(common.SMTPPort)
 	common.OptionMap["SMTPAccount"] = ""
 	common.OptionMap["SMTPToken"] = ""
+	common.OptionMap["SMTPSSLEnabled"] = strconv.FormatBool(common.SMTPSSLEnabled)
 	common.OptionMap["Notice"] = ""
 	common.OptionMap["About"] = ""
 	common.OptionMap["HomePageContent"] = ""
@@ -97,7 +98,7 @@ func InitOptionMap() {
 	common.OptionMap["MjNotifyEnabled"] = strconv.FormatBool(constant.MjNotifyEnabled)
 	common.OptionMap["CheckSensitiveEnabled"] = strconv.FormatBool(constant.CheckSensitiveEnabled)
 	common.OptionMap["CheckSensitiveOnPromptEnabled"] = strconv.FormatBool(constant.CheckSensitiveOnPromptEnabled)
-	common.OptionMap["CheckSensitiveOnCompletionEnabled"] = strconv.FormatBool(constant.CheckSensitiveOnCompletionEnabled)
+	//common.OptionMap["CheckSensitiveOnCompletionEnabled"] = strconv.FormatBool(constant.CheckSensitiveOnCompletionEnabled)
 	common.OptionMap["StopOnSensitiveEnabled"] = strconv.FormatBool(constant.StopOnSensitiveEnabled)
 	common.OptionMap["SensitiveWords"] = constant.SensitiveWordsToString()
 	common.OptionMap["StreamCacheQueueLength"] = strconv.Itoa(constant.StreamCacheQueueLength)
@@ -204,10 +205,12 @@ func updateOptionMap(key string, value string) (err error) {
 			constant.CheckSensitiveEnabled = boolValue
 		case "CheckSensitiveOnPromptEnabled":
 			constant.CheckSensitiveOnPromptEnabled = boolValue
-		case "CheckSensitiveOnCompletionEnabled":
-			constant.CheckSensitiveOnCompletionEnabled = boolValue
+		//case "CheckSensitiveOnCompletionEnabled":
+		//	constant.CheckSensitiveOnCompletionEnabled = boolValue
 		case "StopOnSensitiveEnabled":
 			constant.StopOnSensitiveEnabled = boolValue
+		case "SMTPSSLEnabled":
+			common.SMTPSSLEnabled = boolValue
 		}
 	}
 	switch key {
