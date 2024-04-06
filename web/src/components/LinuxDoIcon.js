@@ -9,8 +9,8 @@ const LinuxDoIcon = (props) => {
         viewBox='0 0 24 24'
         version='1.1'
         xmlns='http://www.w3.org/2000/svg'
-        width='16'
-        height='16'
+        width='1em'
+        height='1em'
         {...props}
       >
         <path
@@ -21,11 +21,7 @@ const LinuxDoIcon = (props) => {
     );
   }
 
-  return (
-    <div>
-      <Icon svg={<CustomIcon />} />
-    </div>
-  );
+  return <Icon svg={<CustomIcon />} />;
 };
 
 export default LinuxDoIcon;

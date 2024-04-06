@@ -226,6 +226,7 @@ const LoginForm = () => {
                         <Button
                           type='primary'
                           icon={<IconGithubLogo />}
+                          style={{ margin: '0 5px' }}
                           onClick={() =>
                             onGitHubOAuthClicked(status.github_client_id)
                           }
@@ -237,7 +238,7 @@ const LoginForm = () => {
                         <Button
                           type='primary'
                           icon={<LinuxDoIcon />}
-                          style={{ color: '#000' }}
+                          style={{ color: '#000', margin: '0 5px' }}
                           onClick={() =>
                             onLinuxDoOAuthClicked(status.linuxdo_client_id)
                           }
@@ -248,7 +249,10 @@ const LoginForm = () => {
                       {status.wechat_login ? (
                         <Button
                           type='primary'
-                          style={{ color: 'rgba(var(--semi-green-5), 1)' }}
+                          style={{
+                            color: 'rgba(var(--semi-green-5), 1)',
+                            margin: '0 5px',
+                          }}
                           icon={<Icon svg={<WeChatIcon />} />}
                           onClick={onWeChatLoginClicked}
                         />
@@ -258,6 +262,8 @@ const LoginForm = () => {
 
                       {status.telegram_oauth ? (
                         <TelegramLoginButton
+                          className='semi-button semi-button-with-icon semi-button-with-icon-only'
+                          buttonSize='medium'
                           dataOnauth={onTelegramLoginClicked}
                           botName={status.telegram_bot_name}
                         />
