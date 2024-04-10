@@ -21,6 +21,8 @@ var DefaultModelRatio = map[string]float64{
 	"gpt-4-32k":                 30,
 	"gpt-4-32k-0314":            30,
 	"gpt-4-32k-0613":            30,
+	"gpt-4-turbo":               5,    // $0.01 / 1K tokens
+	"gpt-4-turbo-2024-04-09":    5,    // $0.01 / 1K tokens
 	"gpt-4-1106-preview":        5,    // $0.01 / 1K tokens
 	"gpt-4-0125-preview":        5,    // $0.01 / 1K tokens
 	"gpt-4-turbo-preview":       5,    // $0.01 / 1K tokens
@@ -203,7 +205,7 @@ func GetCompletionRatio(name string) float64 {
 		return 1.333333
 	}
 	if strings.HasPrefix(name, "gpt-4") {
-		if strings.HasSuffix(name, "preview") {
+		if strings.HasSuffix(name, "preview") || strings.HasPrefix(name, "gpt-4-turbo") {
 			return 3
 		}
 		return 2
