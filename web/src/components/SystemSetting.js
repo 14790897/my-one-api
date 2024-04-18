@@ -10,6 +10,8 @@ import {
 } from 'semantic-ui-react';
 import { API, removeTrailingSlash, showError, verifyJSON } from '../helpers';
 
+import { useTheme } from '../context/Theme';
+
 const SystemSetting = () => {
   let [inputs, setInputs] = useState({
     PasswordLoginEnabled: '',
@@ -61,6 +63,9 @@ const SystemSetting = () => {
   const [restrictedDomainInput, setRestrictedDomainInput] = useState('');
   const [showPasswordWarningModal, setShowPasswordWarningModal] =
     useState(false);
+
+  const theme = useTheme();
+  const isDark = theme === 'dark';
 
   const getOptions = async () => {
     const res = await API.get('/api/option/');
@@ -346,8 +351,10 @@ const SystemSetting = () => {
   return (
     <Grid columns={1}>
       <Grid.Column>
-        <Form loading={loading}>
-          <Header as='h3'>通用设置</Header>
+        <Form loading={loading} inverted={isDark}>
+          <Header as='h3' inverted={isDark}>
+            通用设置
+          </Header>
           <Form.Group widths='equal'>
             <Form.Input
               label='服务器地址'
@@ -361,7 +368,7 @@ const SystemSetting = () => {
             更新服务器地址
           </Form.Button>
           <Divider />
-          <Header as='h3'>
+          <Header as='h3' inverted={isDark}>
             支付设置（当前仅支持Stripe Checkout）
             <Header.Subheader>
               密钥、Webhook 等设置请
@@ -455,7 +462,9 @@ const SystemSetting = () => {
             />
           </Form.Group>
           <Divider />
-          <Header as='h3'>配置登录注册</Header>
+          <Header as='h3' inverted={isDark}>
+            配置登录注册
+          </Header>
           <Form.Group inline>
             <Form.Checkbox
               checked={inputs.PasswordLoginEnabled === 'true'}
@@ -550,7 +559,7 @@ const SystemSetting = () => {
             />
           </Form.Group>
           <Divider />
-          <Header as='h3'>
+          <Header as='h3' inverted={isDark}>
             配置邮箱域名白名单
             <Header.Subheader>
               用以防止恶意用户利用临时邮箱批量注册
@@ -615,7 +624,7 @@ const SystemSetting = () => {
             保存邮箱域名白名单设置
           </Form.Button>
           <Divider />
-          <Header as='h3'>
+          <Header as='h3' inverted={isDark}>
             配置 SMTP
             <Header.Subheader>用以支持系统的邮件发送</Header.Subheader>
           </Header>
@@ -674,7 +683,7 @@ const SystemSetting = () => {
           </Form.Group>
           <Form.Button onClick={submitSMTP}>保存 SMTP 设置</Form.Button>
           <Divider />
-          <Header as='h3'>
+          <Header as='h3' inverted={isDark}>
             配置 GitHub OAuth App
             <Header.Subheader>
               用以支持通过 GitHub 进行登录注册，
@@ -768,7 +777,7 @@ const SystemSetting = () => {
             保存 LINUX DO OAuth 设置
           </Form.Button>
           <Divider />
-          <Header as='h3'>
+          <Header as='h3' inverted={isDark}>
             配置 WeChat Server
             <Header.Subheader>
               用以支持通过微信进行登录注册，
@@ -813,7 +822,9 @@ const SystemSetting = () => {
             保存 WeChat Server 设置
           </Form.Button>
           <Divider />
-          <Header as='h3'>配置 Telegram 登录</Header>
+          <Header as='h3' inverted={isDark}>
+            配置 Telegram 登录
+          </Header>
           <Form.Group inline>
             <Form.Input
               label='Telegram Bot Token'
@@ -834,7 +845,7 @@ const SystemSetting = () => {
             保存 Telegram 登录设置
           </Form.Button>
           <Divider />
-          <Header as='h3'>
+          <Header as='h3' inverted={isDark}>
             配置 Turnstile
             <Header.Subheader>
               用以支持用户校验，
