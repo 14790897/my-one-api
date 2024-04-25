@@ -53,9 +53,9 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *dto.Gen
 		return nil, errors.New("request is nil")
 	}
 	if a.RequestMode == RequestModeCompletion {
-		return requestOpenAI2ClaudeComplete(*request), nil
+		return RequestOpenAI2ClaudeComplete(*request), nil
 	} else {
-		return requestOpenAI2ClaudeMessage(*request)
+		return RequestOpenAI2ClaudeMessage(*request)
 	}
 }
 

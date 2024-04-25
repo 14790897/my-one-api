@@ -12,6 +12,7 @@ import (
 // TODO: when a new api is enabled, check the pricing here
 // 1 === $0.002 / 1K tokens
 // 1 === ￥0.014 / 1k tokens
+
 var DefaultModelRatio = map[string]float64{
 	//"midjourney":                50,
 	"gpt-4-gizmo-*":             15,
@@ -73,11 +74,14 @@ var DefaultModelRatio = map[string]float64{
 	"ERNIE-Bot-4":               8.572,  // ￥0.12 / 1k tokens
 	"Embedding-V1":              0.1429, // ￥0.002 / 1k tokens
 	"PaLM-2":                    1,
-	"gemini-pro":                1, // $0.00025 / 1k characters -> $0.001 / 1k tokens
-	"gemini-pro-vision":         1, // $0.00025 / 1k characters -> $0.001 / 1k tokens
-	"gemini-1.0-pro-vision-001": 1,
-	"gemini-1.0-pro-001":        1,
-	"gemini-1.5-pro":            1,
+	"gemini-pro":                   1, // $0.00025 / 1k characters -> $0.001 / 1k tokens
+	"gemini-pro-vision":            1, // $0.00025 / 1k characters -> $0.001 / 1k tokens
+	"gemini-1.0-pro-vision-001":    1,
+	"gemini-1.0-pro-001":           1,
+	"gemini-1.5-pro-latest":        1,
+	"gemini-1.0-pro-latest":        1,
+	"gemini-1.0-pro-vision-latest": 1,
+	"gemini-ultra":                 1,
 	"chatglm_turbo":             0.3572, // ￥0.005 / 1k tokens
 	"chatglm_pro":               0.7143, // ￥0.01 / 1k tokens
 	"chatglm_std":               0.3572, // ￥0.005 / 1k tokens
@@ -102,6 +106,12 @@ var DefaultModelRatio = map[string]float64{
 	"yi-34b-chat-0205": 0.018,
 	"yi-34b-chat-200k": 0.0864,
 	"yi-vl-plus":       0.0432,
+	"command":               0.5,
+	"command-nightly":       0.5,
+	"command-light":         0.5,
+	"command-light-nightly": 0.5,
+	"command-r":             0.25,
+	"command-r-plus	":       1.5,
 }
 
 var DefaultModelPrice = map[string]float64{
@@ -222,6 +232,16 @@ func GetCompletionRatio(name string) float64 {
 	}
 	if strings.HasPrefix(name, "gemini-") {
 		return 3
+	}
+	if strings.HasPrefix(name, "command") {
+		switch name {
+		case "command-r":
+			return 3
+		case "command-r-plus":
+			return 5
+		default:
+			return 2
+		}
 	}
 	switch name {
 	case "llama2-70b-4096":

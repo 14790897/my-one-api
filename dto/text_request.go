@@ -32,6 +32,21 @@ type GeneralOpenAIRequest struct {
 	TopLogProbs      int             `json:"top_logprobs,omitempty"`
 }
 
+type OpenAITools struct {
+	Type     string         `json:"type"`
+	Function OpenAIFunction `json:"function"`
+}
+
+type OpenAIFunction struct {
+	Description string `json:"description,omitempty"`
+	Name        string `json:"name"`
+	Parameters  any    `json:"parameters,omitempty"`
+}
+
+func (r GeneralOpenAIRequest) GetMaxTokens() int64 {
+	return int64(r.MaxTokens)
+}
+
 func (r GeneralOpenAIRequest) ParseInput() []string {
 	if r.Input == nil {
 		return nil

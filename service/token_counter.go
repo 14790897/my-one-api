@@ -116,6 +116,41 @@ func getImageToken(imageUrl *dto.MessageImageUrl) (int, error) {
 	return tiles*170 + 85, nil
 }
 
+func CountTokenChatRequest(request dto.GeneralOpenAIRequest, model string, checkSensitive bool) (int, error, bool) {
+	tkm := 0
+	msgTokens, err, b := CountTokenMessages(request.Messages, model, checkSensitive)
+	if err != nil {
+		return 0, err, b
+	}
+	tkm += msgTokens
+	if request.Tools != nil {
+		toolsData, _ := json.Marshal(request.Tools)
+		var openaiTools []dto.OpenAITools
+		err := json.Unmarshal(toolsData, &openaiTools)
+		if err != nil {
+			return 0, errors.New(fmt.Sprintf("count_tools_token_fail: %s", err.Error())), false
+		}
+		countStr := ""
+		for _, tool := range openaiTools {
+			countStr = tool.Function.Name
+			if tool.Function.Description != "" {
+				countStr += tool.Function.Description
+			}
+			if tool.Function.Parameters != nil {
+				countStr += fmt.Sprintf("%v", tool.Function.Parameters)
+			}
+		}
+		toolTokens, err, _ := CountTokenInput(countStr, model, false)
+		if err != nil {
+			return 0, err, false
+		}
+		tkm += 8
+		tkm += toolTokens
+	}
+
+	return tkm, nil, false
+}
+
 func CountTokenMessages(messages []dto.Message, model string, checkSensitive bool) (int, error, bool) {
 	//recover when panic
 	tokenEncoder := getTokenEncoder(model)
@@ -138,48 +173,31 @@ func CountTokenMessages(messages []dto.Message, model string, checkSensitive boo
 		tokenNum += tokensPerMessage
 		tokenNum += getTokenNum(tokenEncoder, message.Role)
 		if len(message.Content) > 0 {
-			var arrayContent []dto.MediaMessage
-			if err := json.Unmarshal(message.Content, &arrayContent); err != nil {
-				var stringContent string
-				if err := json.Unmarshal(message.Content, &stringContent); err != nil {
-					return 0, err, false
-				} else {
-					if checkSensitive {
-						contains, words := SensitiveWordContains(stringContent)
-						if contains {
-							err := fmt.Errorf("message contains sensitive words: [%s]", strings.Join(words, ", "))
-							return 0, err, true
-						}
-					}
-					tokenNum += getTokenNum(tokenEncoder, stringContent)
-					if message.Name != nil {
-						tokenNum += tokensPerName
-						tokenNum += getTokenNum(tokenEncoder, *message.Name)
+			if message.IsStringContent() {
+				stringContent := message.StringContent()
+				if checkSensitive {
+					contains, words := SensitiveWordContains(stringContent)
+					if contains {
+						err := fmt.Errorf("message contains sensitive words: [%s]", strings.Join(words, ", "))
+						return 0, err, true
 					}
 				}
+				tokenNum += getTokenNum(tokenEncoder, stringContent)
+				if message.Name != nil {
+					tokenNum += tokensPerName
+					tokenNum += getTokenNum(tokenEncoder, *message.Name)
+				}
 			} else {
+				var err error
+				arrayContent := message.ParseContent()
 				for _, m := range arrayContent {
 					if m.Type == "image_url" {
 						var imageTokenNum int
 						if model == "glm-4v" {
 							imageTokenNum = 1047
 						} else {
-							if str, ok := m.ImageUrl.(string); ok {
-								imageTokenNum, err = getImageToken(&dto.MessageImageUrl{Url: str, Detail: "auto"})
-							} else {
-								imageUrlMap := m.ImageUrl.(map[string]interface{})
-								detail, ok := imageUrlMap["detail"]
-								if ok {
-									imageUrlMap["detail"] = detail.(string)
-								} else {
-									imageUrlMap["detail"] = "auto"
-								}
-								imageUrl := dto.MessageImageUrl{
-									Url:    imageUrlMap["url"].(string),
-									Detail: imageUrlMap["detail"].(string),
-								}
-								imageTokenNum, err = getImageToken(&imageUrl)
-							}
+							imageUrl := m.ImageUrl.(dto.MessageImageUrl)
+							imageTokenNum, err = getImageToken(&imageUrl)
 							if err != nil {
 								return 0, err, false
 							}
@@ -209,6 +227,23 @@ func CountTokenInput(input any, model string, check bool) (int, error, bool) {
 		return CountTokenText(text, model, check)
 	}
 	return CountTokenInput(fmt.Sprintf("%v", input), model, check)
+}
+
+func CountTokenStreamChoices(messages []dto.ChatCompletionsStreamResponseChoice, model string) int {
+	tokens := 0
+	for _, message := range messages {
+		tkm, _, _ := CountTokenInput(message.Delta.Content, model, false)
+		tokens += tkm
+		if message.Delta.ToolCalls != nil {
+			for _, tool := range message.Delta.ToolCalls {
+				tkm, _, _ := CountTokenInput(tool.Function.Name, model, false)
+				tokens += tkm
+				tkm, _, _ = CountTokenInput(tool.Function.Arguments, model, false)
+				tokens += tkm
+			}
+		}
+	}
+	return tokens
 }
 
 func CountAudioToken(text string, model string, check bool) (int, error, bool) {

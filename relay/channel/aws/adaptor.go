@@ -1,31 +1,38 @@
-package perplexity
+package aws
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"one-api/dto"
-	"one-api/relay/channel"
-	"one-api/relay/channel/openai"
+	"one-api/relay/channel/claude"
 	relaycommon "one-api/relay/common"
-	"one-api/service"
+	"strings"
+)
+
+const (
+	RequestModeCompletion = 1
+	RequestModeMessage    = 2
 )
 
 type Adaptor struct {
+	RequestMode int
 }
 
 func (a *Adaptor) Init(info *relaycommon.RelayInfo, request dto.GeneralOpenAIRequest) {
+	if strings.HasPrefix(info.UpstreamModelName, "claude-3") {
+		a.RequestMode = RequestModeMessage
+	} else {
+		a.RequestMode = RequestModeCompletion
+	}
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	return fmt.Sprintf("%s/chat/completions", info.BaseUrl), nil
+	return "", nil
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Request, info *relaycommon.RelayInfo) error {
-	channel.SetupApiRequestHeader(info, c, req)
-	req.Header.Set("Authorization", "Bearer "+info.ApiKey)
 	return nil
 }
 
@@ -33,29 +40,38 @@ func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *dto.Gen
 	if request == nil {
 		return nil, errors.New("request is nil")
 	}
-	if request.TopP >= 1 {
-		request.TopP = 0.99
+
+	var claudeReq *claude.ClaudeRequest
+	var err error
+	if a.RequestMode == RequestModeCompletion {
+		claudeReq = claude.RequestOpenAI2ClaudeComplete(*request)
+	} else {
+		claudeReq, err = claude.RequestOpenAI2ClaudeMessage(*request)
 	}
-	return requestOpenAI2Perplexity(*request), nil
+	c.Set("request_model", request.Model)
+	c.Set("converted_request", claudeReq)
+	return claudeReq, err
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (*http.Response, error) {
-	return channel.DoApiRequest(a, c, info, requestBody)
+	return nil, nil
 }
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage *dto.Usage, err *dto.OpenAIErrorWithStatusCode) {
 	if info.IsStream {
-		var responseText string
-		err, responseText, _ = openai.OpenaiStreamHandler(c, resp, info.RelayMode)
-		usage, _ = service.ResponseText2Usage(responseText, info.UpstreamModelName, info.PromptTokens)
+		err, usage = awsStreamHandler(c, info, a.RequestMode)
 	} else {
-		err, usage = openai.OpenaiHandler(c, resp, info.PromptTokens, info.UpstreamModelName)
+		err, usage = awsHandler(c, info, a.RequestMode)
 	}
 	return
 }
 
-func (a *Adaptor) GetModelList() []string {
-	return ModelList
+func (a *Adaptor) GetModelList() (models []string) {
+	for n := range awsModelIDMap {
+		models = append(models, n)
+	}
+
+	return
 }
 
 func (a *Adaptor) GetChannelName() string {

@@ -23,6 +23,13 @@ export const CHANNEL_OPTIONS = [
     label: 'Anthropic Claude',
   },
   {
+    key: 33,
+    text: 'AWS Claude',
+    value: 33,
+    color: 'indigo',
+    label: 'AWS Claude',
+  },
+  {
     key: 3,
     text: 'Azure OpenAI',
     value: 3,
@@ -42,6 +49,13 @@ export const CHANNEL_OPTIONS = [
     value: 24,
     color: 'orange',
     label: 'Google Gemini',
+  },
+  {
+    key: 34,
+    text: 'Cohere',
+    value: 34,
+    color: 'purple',
+    label: 'Cohere',
   },
   {
     key: 15,

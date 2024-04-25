@@ -208,7 +208,6 @@ const LoginForm = () => {
                   </Text>
                 </div>
                 {status.github_oauth ||
-                status.linuxdo_oauth ||
                 status.wechat_login ||
                 status.telegram_oauth ? (
                   <>
@@ -226,7 +225,6 @@ const LoginForm = () => {
                         <Button
                           type='primary'
                           icon={<IconGithubLogo />}
-                          style={{ margin: '0 5px' }}
                           onClick={() =>
                             onGitHubOAuthClicked(status.github_client_id)
                           }

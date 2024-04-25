@@ -1,16 +1,13 @@
-package perplexity
+package cohere
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"one-api/dto"
 	"one-api/relay/channel"
-	"one-api/relay/channel/openai"
 	relaycommon "one-api/relay/common"
-	"one-api/service"
 )
 
 type Adaptor struct {
@@ -20,23 +17,17 @@ func (a *Adaptor) Init(info *relaycommon.RelayInfo, request dto.GeneralOpenAIReq
 }
 
 func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
-	return fmt.Sprintf("%s/chat/completions", info.BaseUrl), nil
+	return fmt.Sprintf("%s/v1/chat", info.BaseUrl), nil
 }
 
 func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Request, info *relaycommon.RelayInfo) error {
 	channel.SetupApiRequestHeader(info, c, req)
-	req.Header.Set("Authorization", "Bearer "+info.ApiKey)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", info.ApiKey))
 	return nil
 }
 
 func (a *Adaptor) ConvertRequest(c *gin.Context, relayMode int, request *dto.GeneralOpenAIRequest) (any, error) {
-	if request == nil {
-		return nil, errors.New("request is nil")
-	}
-	if request.TopP >= 1 {
-		request.TopP = 0.99
-	}
-	return requestOpenAI2Perplexity(*request), nil
+	return requestOpenAI2Cohere(*request), nil
 }
 
 func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, requestBody io.Reader) (*http.Response, error) {
@@ -45,11 +36,9 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage *dto.Usage, err *dto.OpenAIErrorWithStatusCode) {
 	if info.IsStream {
-		var responseText string
-		err, responseText, _ = openai.OpenaiStreamHandler(c, resp, info.RelayMode)
-		usage, _ = service.ResponseText2Usage(responseText, info.UpstreamModelName, info.PromptTokens)
+		err, usage = cohereStreamHandler(c, resp, info.UpstreamModelName, info.PromptTokens)
 	} else {
-		err, usage = openai.OpenaiHandler(c, resp, info.PromptTokens, info.UpstreamModelName)
+		err, usage = cohereHandler(c, resp, info.UpstreamModelName, info.PromptTokens)
 	}
 	return
 }

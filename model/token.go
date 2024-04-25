@@ -102,6 +102,11 @@ func GetTokenById(id int) (*Token, error) {
 	token := Token{Id: id}
 	var err error = nil
 	err = DB.First(&token, "id = ?", id).Error
+	if err != nil {
+		if common.RedisEnabled {
+			go cacheSetToken(&token)
+		}
+	}
 	return &token, err
 }
 
