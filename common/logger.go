@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -99,10 +100,22 @@ func LogQuota(quota int) string {
 	}
 }
 
+
 func LogQuotaF(quota float64) string {
 	if DisplayInCurrencyEnabled {
 		return fmt.Sprintf("＄%.6f 额度", quota/QuotaPerUnit)
 	} else {
 		return fmt.Sprintf("%d 点额度", int64(quota))
 	}
+}
+
+
+// LogJson 仅供测试使用 only for test
+func LogJson(ctx context.Context, msg string, obj any) {
+	jsonStr, err := json.Marshal(obj)
+	if err != nil {
+		LogError(ctx, fmt.Sprintf("json marshal failed: %s", err.Error()))
+		return
+	}
+	LogInfo(ctx, fmt.Sprintf("%s | %s", msg, string(jsonStr)))
 }
