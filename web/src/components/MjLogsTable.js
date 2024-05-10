@@ -239,7 +239,7 @@ const renderTimestamp = (timestampInSeconds) => {
 // 修改renderDuration函数以包含颜色逻辑
 function renderDuration(submit_time, finishTime) {
   // 确保startTime和finishTime都是有效的时间戳
-  if (!submit_time || !finishTime) return 'N/A'; 
+  if (!submit_time || !finishTime) return 'N/A';
 
   // 将时间戳转换为Date对象
   const start = new Date(submit_time);
@@ -256,7 +256,7 @@ function renderDuration(submit_time, finishTime) {
 
   // 返回带有样式的颜色标签
   return (
-    <Tag color={color} size="large">
+    <Tag color={color} size='large'>
       {durationSec} 秒
     </Tag>
   );
