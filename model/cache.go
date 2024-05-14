@@ -293,6 +293,8 @@ func SyncChannelCache(frequency int) {
 func CacheGetRandomSatisfiedChannel(group string, model string, retry int) (*Channel, error) {
 	if strings.HasPrefix(model, "gpt-4-gizmo") {
 		model = "gpt-4-gizmo-*"
+	} else if strings.HasPrefix(model, "g-") {
+		model = "g-*"
 	}
 
 	// if memory cache is disabled, get channel directly from database

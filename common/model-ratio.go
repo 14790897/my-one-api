@@ -16,6 +16,7 @@ import (
 var DefaultModelRatio = map[string]float64{
 	//"midjourney":                50,
 	"gpt-4-gizmo-*":                15,
+	"g-*":                          15,
 	"gpt-4":                        15,
 	"gpt-4-0314":                   15,
 	"gpt-4-0613":                   15,
@@ -120,6 +121,7 @@ var DefaultModelRatio = map[string]float64{
 
 var DefaultModelPrice = map[string]float64{
 	"gpt-4-gizmo-*":     0.1,
+	"g-*":               0.1,
 	"mj_imagine":        0.1,
 	"mj_variation":      0.1,
 	"mj_reroll":         0.1,
@@ -162,6 +164,8 @@ func GetModelPrice(name string, printErr bool) float64 {
 	}
 	if strings.HasPrefix(name, "gpt-4-gizmo") {
 		name = "gpt-4-gizmo-*"
+	} else if strings.HasPrefix(name, "g-") {
+		name = "g-*"
 	}
 	price, ok := modelPrice[name]
 	if !ok {
@@ -195,6 +199,8 @@ func GetModelRatio(name string) float64 {
 	}
 	if strings.HasPrefix(name, "gpt-4-gizmo") {
 		name = "gpt-4-gizmo-*"
+	} else if strings.HasPrefix(name, "g-") {
+		name = "g-*"
 	}
 	ratio, ok := modelRatio[name]
 	if !ok {

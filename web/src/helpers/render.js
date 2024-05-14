@@ -186,6 +186,7 @@ export const modelColorMap = {
   'gpt-4-32k-0613': 'rgb(61,71,139)', // 暗蓝灰色
   'gpt-4-all': 'rgb(65,105,225)', // 皇家蓝
   'gpt-4-gizmo-*': 'rgb(0,0,255)', // 纯蓝色
+  'g-*': 'rgb(0,0,255)', // 纯蓝色
   'gpt-4-vision-preview': 'rgb(25,25,112)', // 午夜蓝
   'text-ada-001': 'rgb(255,192,203)', // 粉红色
   'text-babbage-001': 'rgb(255,160,122)', // 浅珊瑚色

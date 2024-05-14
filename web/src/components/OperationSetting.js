@@ -579,7 +579,7 @@ const OperationSetting = () => {
               style={{ minHeight: 250, fontFamily: 'JetBrains Mono, Consolas' }}
               autoComplete='new-password'
               value={inputs.ModelPrice}
-              placeholder='为一个 JSON 文本，键为模型名称，值为一次调用消耗多少刀，比如 "gpt-4-gizmo-*": 0.1，一次消耗0.1刀'
+              placeholder='为一个 JSON 文本，键为模型名称，值为一次调用消耗多少刀，比如 "gpt-4-gizmo-*": 0.1（或 "g-*": 0.1），一次消耗0.1刀'
             />
           </Form.Group>
           <Form.Group widths='equal'>

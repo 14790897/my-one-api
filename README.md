@@ -50,14 +50,14 @@
 
 ## 模型支持
 此版本额外支持以下模型：
-1. 第三方模型 **gps** （gpt-4-gizmo-*）
+1. 第三方模型 **gps** （gpt-4-gizmo-*, g-*）
 2. 智谱glm-4v，glm-4v识图
 3. Anthropic Claude 3 (claude-3-opus-20240229, claude-3-sonnet-20240229)
 4. [Ollama](https://github.com/ollama/ollama?tab=readme-ov-file)，添加渠道时，密钥可以随便填写，默认的请求地址是[http://localhost:11434](http://localhost:11434)，如果需要修改请在渠道中修改
 5. [Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy)接口，[对接文档](Midjourney.md)
 6. [零一万物](https://platform.lingyiwanwu.com/)
 
-您可以在渠道中添加自定义模型gpt-4-gizmo-*，此模型并非OpenAI官方模型，而是第三方模型，使用官方key无法调用。
+您可以在渠道中添加自定义模型gpt-4-gizmo-*或g-*，此模型并非OpenAI官方模型，而是第三方模型，使用官方key无法调用。
 
 ## 渠道重试
 渠道重试功能已经实现，可以在`设置->运营设置->通用设置`设置重试次数，建议开启缓存功能。  

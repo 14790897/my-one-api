@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/pkoukk/tiktoken-go"
+	"github.com/linux-do/tiktoken-go"
 	"image"
 	"log"
 	"math"
@@ -29,9 +29,16 @@ func InitTokenEncoders() {
 	if err != nil {
 		common.FatalLog(fmt.Sprintf("failed to get gpt-4 token encoder: %s", err.Error()))
 	}
+
+	gpt4oTokenEncoder, err := tiktoken.EncodingForModel("gpt-4o")
+	if err != nil {
+		common.FatalLog(fmt.Sprintf("failed to get gpt-4o token encoder: %s", err.Error()))
+	}
 	for model, _ := range common.DefaultModelRatio {
 		if strings.HasPrefix(model, "gpt-3.5") {
 			tokenEncoderMap[model] = gpt35TokenEncoder
+		} else if strings.HasPrefix(model, "gpt-4o") {
+			tokenEncoderMap[model] = gpt4oTokenEncoder
 		} else if strings.HasPrefix(model, "gpt-4") {
 			tokenEncoderMap[model] = gpt4TokenEncoder
 		} else {
