@@ -20,6 +20,7 @@ import TelegramLoginButton from 'react-telegram-login';
 import { IconGithubLogo } from '@douyinfe/semi-icons';
 import LinuxDoIcon from './LinuxDoIcon';
 import WeChatIcon from './WeChatIcon';
+import { setUserData } from '../helpers/data.js';
 
 const LoginForm = () => {
   const [inputs, setInputs] = useState({
@@ -100,7 +101,7 @@ const LoginForm = () => {
       const { success, message, data } = res.data;
       if (success) {
         userDispatch({ type: 'login', payload: data });
-        localStorage.setItem('user', JSON.stringify(data));
+        setUserData(data);
         showSuccess('登录成功！');
         if (username === 'root' && password === '123456') {
           Modal.error({

@@ -31,6 +31,7 @@ import {
 } from '@douyinfe/semi-ui';
 import EditChannel from '../pages/Channel/EditChannel';
 import { IconTreeTriangleDown } from '@douyinfe/semi-icons';
+import { loadChannelModels } from './utils.js';
 
 function renderTimestamp(timestamp) {
   return <>{timestamp2string(timestamp)}</>;
@@ -397,6 +398,7 @@ const ChannelsTable = () => {
         showError(reason);
       });
     fetchGroups().then();
+    loadChannelModels().then();
   }, []);
 
   const manageChannel = async (id, action, record, value) => {
