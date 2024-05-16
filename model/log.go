@@ -155,6 +155,16 @@ func GetUserLogs(userId int, logType int, startTimestamp int64, endTimestamp int
 
 	err = tx.Order("id desc").Limit(num).Offset(startIdx).Omit("id").Find(&logs).Error
 	return logs, total, err
+	for i := range logs {
+		var otherMap map[string]interface{}
+		otherMap = common.StrToMap(logs[i].Other)
+		if otherMap != nil {
+			// delete admin
+			delete(otherMap, "admin_info")
+		}
+		logs[i].Other = common.MapToJsonStr(otherMap)
+	}
+	return logs, total, err
 }
 
 func SearchAllLogs(keyword string) (logs []*Log, err error) {
