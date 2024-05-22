@@ -433,11 +433,15 @@ const EditChannel = (props) => {
           {inputs.type === 8 && (
             <>
               <div style={{ marginTop: 10 }}>
-                <Typography.Text strong>Base URL：</Typography.Text>
+                <Typography.Text strong>
+                  完整的 Base URL，支持变量{'{model}'}：
+                </Typography.Text>
               </div>
               <Input
                 name='base_url'
-                placeholder={'请输入自定义渠道的 Base URL'}
+                placeholder={
+                  '请输入完整的URL，例如：https://api.openai.com/v1/chat/completions'
+                }
                 onChange={(value) => {
                   handleInputChange('base_url', value);
                 }}
