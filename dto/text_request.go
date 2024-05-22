@@ -33,7 +33,7 @@ type GeneralOpenAIRequest struct {
 	ToolChoice       any             `json:"tool_choice,omitempty"`
 	User             string          `json:"user,omitempty"`
 	LogitBias        any             `json:"logit_bias"`
-	LogProbs         bool            `json:"logprobs,omitempty"`
+	LogProbs         any             `json:"logprobs,omitempty"`
 	TopLogProbs      int             `json:"top_logprobs,omitempty"`
 }
 

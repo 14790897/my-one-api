@@ -191,7 +191,15 @@ func getPromptTokens(textRequest *dto.GeneralOpenAIRequest, info *relaycommon.Re
 	case relayconstant.RelayModeChatCompletions:
 		promptTokens, err, sensitiveTrigger = service.CountTokenChatRequest(*textRequest, textRequest.Model, checkSensitive)
 	case relayconstant.RelayModeCompletions:
-		promptTokens, err, sensitiveTrigger = service.CountTokenInput(textRequest.Prompt, textRequest.Model, checkSensitive)
+		prompts := textRequest.Prompt
+		switch v := prompts.(type) {
+		case string:
+			prompts = v + textRequest.Suffix
+		case []string:
+			prompts = append(v, textRequest.Suffix)
+		}
+
+		promptTokens, err, sensitiveTrigger = service.CountTokenInput(prompts, textRequest.Model, checkSensitive)
 	case relayconstant.RelayModeModerations:
 		promptTokens, err, sensitiveTrigger = service.CountTokenInput(textRequest.Input, textRequest.Model, checkSensitive)
 	case relayconstant.RelayModeEmbeddings:
