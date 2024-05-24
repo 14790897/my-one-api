@@ -10,11 +10,11 @@ type GeneralOpenAIRequest struct {
 	Model            string          `json:"model,omitempty"`
 	Messages         []Message       `json:"messages,omitempty"`
 	Prompt           any             `json:"prompt,omitempty"`
-	BestOf           int             `json:"best_of"`
-	Echo             bool            `json:"echo"`
+	BestOf           int             `json:"best_of,omitempty"`
+	Echo             bool            `json:"echo,omitempty"`
 	Stream           bool            `json:"stream,omitempty"`
-	StreamOptions    any             `json:"stream_options"`
-	Suffix           string          `json:"suffix"`
+	StreamOptions    any             `json:"stream_options,omitempty"`
+	Suffix           string          `json:"suffix,omitempty"`
 	MaxTokens        uint            `json:"max_tokens,omitempty"`
 	Temperature      float64         `json:"temperature,omitempty"`
 	TopP             float64         `json:"top_p,omitempty"`
@@ -32,7 +32,7 @@ type GeneralOpenAIRequest struct {
 	Tools            any             `json:"tools,omitempty"`
 	ToolChoice       any             `json:"tool_choice,omitempty"`
 	User             string          `json:"user,omitempty"`
-	LogitBias        any             `json:"logit_bias"`
+	LogitBias        any             `json:"logit_bias,omitempty"`
 	LogProbs         any             `json:"logprobs,omitempty"`
 	TopLogProbs      int             `json:"top_logprobs,omitempty"`
 }
