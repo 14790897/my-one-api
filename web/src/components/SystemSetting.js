@@ -31,6 +31,7 @@ const SystemSetting = () => {
     SMTPFrom: '',
     SMTPToken: '',
     ServerAddress: '',
+    OutProxyUrl: '',
     StripeApiSecret: '',
     StripeWebhookSecret: '',
     StripePriceId: '',
@@ -150,6 +151,7 @@ const SystemSetting = () => {
       name === 'Notice' ||
       (name.startsWith('SMTP') && name !== 'SMTPSSLEnabled') ||
       name === 'ServerAddress' ||
+      name === 'OutProxyUrl' ||
       name === 'StripeApiSecret' ||
       name === 'StripeWebhookSecret' ||
       name === 'StripePriceId' ||
@@ -179,6 +181,11 @@ const SystemSetting = () => {
   const submitServerAddress = async () => {
     let ServerAddress = removeTrailingSlash(inputs.ServerAddress);
     await updateOption('ServerAddress', ServerAddress);
+  };
+
+  const submitOutProxyUrl = async () => {
+    let OutProxyUrl = removeTrailingSlash(inputs.OutProxyUrl);
+    await updateOption('OutProxyUrl', OutProxyUrl);
   };
 
   const submitPaymentConfig = async () => {
@@ -367,6 +374,20 @@ const SystemSetting = () => {
           <Form.Button onClick={submitServerAddress}>
             更新服务器地址
           </Form.Button>
+          <Divider />
+          <Header as='h3' inverted={isDark}>
+            代理设置
+          </Header>
+          <Form.Group widths='equal'>
+            <Form.Input
+              label='出口代理地址'
+              placeholder='例如：http://1.2.3.4:8888'
+              value={inputs.OutProxyUrl}
+              name='OutProxyUrl'
+              onChange={handleInputChange}
+            />
+          </Form.Group>
+          <Form.Button onClick={submitOutProxyUrl}>更新代理设置</Form.Button>
           <Divider />
           <Header as='h3' inverted={isDark}>
             支付设置（当前仅支持Stripe Checkout）

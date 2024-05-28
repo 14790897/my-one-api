@@ -8,7 +8,6 @@ import (
 	"golang.org/x/image/webp"
 	"image"
 	"io"
-	"net/http"
 	"strings"
 )
 
@@ -32,7 +31,7 @@ func DecodeBase64ImageData(base64String string) (image.Config, string, string, e
 }
 
 func IsImageUrl(url string) (bool, error) {
-	resp, err := http.Head(url)
+	resp, err := ProxiedHttpHead(url, OutProxyUrl)
 	if err != nil {
 		return false, err
 	}
@@ -48,7 +47,7 @@ func GetImageFromUrl(url string) (mimeType string, data string, err error) {
 	if !isImage {
 		return
 	}
-	resp, err := http.Get(url)
+	resp, err := ProxiedHttpGet(url, OutProxyUrl)
 	if err != nil {
 		return
 	}
@@ -64,7 +63,7 @@ func GetImageFromUrl(url string) (mimeType string, data string, err error) {
 }
 
 func DecodeUrlImageData(imageUrl string) (image.Config, string, error) {
-	response, err := http.Get(imageUrl)
+	response, err := ProxiedHttpGet(imageUrl, OutProxyUrl)
 	if err != nil {
 		SysLog(fmt.Sprintf("fail to get image from url: %s", err.Error()))
 		return image.Config{}, "", err

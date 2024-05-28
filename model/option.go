@@ -61,6 +61,7 @@ func InitOptionMap() {
 	common.OptionMap["SystemName"] = common.SystemName
 	common.OptionMap["Logo"] = common.Logo
 	common.OptionMap["ServerAddress"] = ""
+	common.OptionMap["OutProxyUrl"] = ""
 	common.OptionMap["StripeApiSecret"] = common.StripeApiSecret
 	common.OptionMap["StripeWebhookSecret"] = common.StripeWebhookSecret
 	common.OptionMap["StripePriceId"] = common.StripePriceId
@@ -242,6 +243,8 @@ func updateOptionMap(key string, value string) (err error) {
 		common.SMTPToken = value
 	case "ServerAddress":
 		common.ServerAddress = value
+	case "OutProxyUrl":
+		common.OutProxyUrl = value
 	case "StripeApiSecret":
 		common.StripeApiSecret = value
 	case "StripeWebhookSecret":

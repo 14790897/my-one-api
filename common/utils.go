@@ -1,13 +1,18 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"golang.org/x/net/proxy"
 	"html/template"
 	"log"
 	"math/rand"
 	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"runtime"
@@ -266,4 +271,57 @@ func StrToMap(str string) map[string]interface{} {
 		return nil
 	}
 	return m
+}
+
+func GetProxiedHttpClient(proxyUrl string) (*http.Client, error) {
+	if "" == proxyUrl {
+		return &http.Client{}, nil
+	}
+
+	u, err := url.Parse(proxyUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	if strings.HasPrefix(proxyUrl, "http") {
+
+		return &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(u),
+			},
+		}, nil
+	} else if strings.HasPrefix(proxyUrl, "socks") {
+		dialer, err := proxy.FromURL(u, proxy.Direct)
+		if err != nil {
+			return nil, err
+		}
+
+		return &http.Client{
+			Transport: &http.Transport{
+				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+					return dialer.(proxy.ContextDialer).DialContext(ctx, network, addr)
+				},
+			},
+		}, nil
+	}
+
+	return nil, errors.New("unsupported proxy type")
+}
+
+func ProxiedHttpGet(url, proxyUrl string) (*http.Response, error) {
+	client, err := GetProxiedHttpClient(proxyUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Get(url)
+}
+
+func ProxiedHttpHead(url, proxyUrl string) (*http.Response, error) {
+	client, err := GetProxiedHttpClient(proxyUrl)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.Head(url)
 }
