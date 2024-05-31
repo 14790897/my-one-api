@@ -51,6 +51,9 @@ func GetImageFromUrl(url string) (mimeType string, data string, err error) {
 	if err != nil {
 		return
 	}
+	if !strings.HasPrefix(resp.Header.Get("Content-Type"), "image/") {
+		return
+	}
 	defer resp.Body.Close()
 	buffer := bytes.NewBuffer(nil)
 	_, err = buffer.ReadFrom(resp.Body)
@@ -69,6 +72,11 @@ func DecodeUrlImageData(imageUrl string) (image.Config, string, error) {
 		return image.Config{}, "", err
 	}
 	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		err = errors.New(fmt.Sprintf("fail to get image from url: %s", response.Status))
+		return image.Config{}, "", err
+	}
 
 	var readData []byte
 	for _, limit := range []int64{1024 * 8, 1024 * 24, 1024 * 64} {
