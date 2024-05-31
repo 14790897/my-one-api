@@ -209,6 +209,7 @@ const LoginForm = () => {
                   </Text>
                 </div>
                 {status.github_oauth ||
+                status.linuxdo_oauth ||
                 status.wechat_login ||
                 status.telegram_oauth ? (
                   <>
