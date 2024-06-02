@@ -6,3 +6,5 @@ upload
 build
 *.db-journal
 logs
+web/dist
+other.json

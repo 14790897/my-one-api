@@ -1,0 +1,41 @@
+# Air configuration file
+
+# 根目录，默认为当前目录
+root = "."
+# tmp_dir 指定临时存放编译结果的目录
+tmp_dir = "tmp"
+
+[build]
+# 要执行的编译命令
+cmd = "go build -o ./tmp/main.exe ."
+# 监视哪些文件变化时需要触发编译，支持通配符
+include = ["*.go", "go.mod"]
+# 排除 node_modules 目录
+exclude_dir = ["web"]
+# 在编译之前要执行的命令列表
+pre_cmds = ["echo 'pre build commands'"]
+# 在编译之后要执行的命令列表
+post_cmds = ["echo 'post build commands'"]
+
+[log]
+# 设置日志的时间格式
+time_format = "2006-01-02 15:04:05"
+
+[color]
+# 设置日志中的各种消息颜色
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[serve]
+# serve 相关配置定义了如何运行程序
+cmd = "go run main.go"
+# 程序启动需要监听的端口
+port = 8080
+# 监视哪些文件变化时需要重启程序，支持通配符
+# watch = [".env"]
+# 在程序启动之前要执行的命令列表
+pre_serve_cmds = ["echo 'pre serve commands'"]
+# 是否在文件变化时自动重启程序
+restart_on_change = true

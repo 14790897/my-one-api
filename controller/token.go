@@ -120,7 +120,7 @@ func AddToken(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": false,
 			"message": "令牌名称过长",
-		})
+		})  
 		return
 	}
 	cleanToken := model.Token{
