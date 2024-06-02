@@ -8,6 +8,7 @@ import (
 	"one-api/model"
 	"strconv"
 	"sync"
+	"errors" // 添加这一行
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -186,11 +187,38 @@ func Register(c *gin.Context) {
 		})
 		return
 	}
+		// 生成访问令牌
+	accessToken, err := GenerateAccessTokenForUser(&cleanUser)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
+		"accesstoken": accessToken,
 	})
 	return
+}
+
+func GenerateAccessTokenForUser(user *model.User) (string, error) {
+	user.AccessToken = common.GetUUID()
+
+	// 检查生成的 UUID 是否重复
+	if model.DB.Where("access_token = ?", user.AccessToken).First(user).RowsAffected != 0 {
+		return "", errors.New("请重试，系统生成的 UUID 竟然重复了！")
+	}
+
+	// 更新用户信息
+	if err := user.Update(false); err != nil {
+		return "", err
+	}
+
+	return user.AccessToken, nil
 }
 
 func GetAllUsers(c *gin.Context) {
