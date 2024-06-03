@@ -196,7 +196,7 @@ func Register(c *gin.Context) {
 		})
 		return
 	}
-
+		// 这里在注册的时候直接返回了访问令牌
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "",
