@@ -27,12 +27,12 @@ var buildFS embed.FS
 var indexPage []byte
 
 // 允许的域名列表
-var allowedOrigins = map[string]bool{
-	"http://localhost:3000":    true,
-	"https://a.nextweb.fun":    true,
-	"http://localhost:3001":    true,
-	"https://api.paperai.life": true,
-}
+// var allowedOrigins = map[string]bool{
+// 	"http://localhost:3000":    true,
+// 	"https://a.nextweb.fun":    true,
+// 	"http://localhost:3001":    true,
+// 	"https://api.paperai.life": true,
+// }
 
 // CORS 中间件
 func CORSMiddleware() gin.HandlerFunc {
