@@ -157,7 +157,7 @@ func main() {
 			},
 		})
 	}))
-	server.Use(CORSMiddleware()) // 添加 CORS 中间件
+	// server.Use(CORSMiddleware()) // 添加 CORS 中间件
 	// This will cause SSE not to work!!!
 	//server.Use(gzip.Gzip(gzip.DefaultCompression))
 	server.Use(middleware.RequestId())
