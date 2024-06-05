@@ -96,7 +96,7 @@ func SetApiRouter(router *gin.Engine) {
 		}
 		tokenRoute := apiRouter.Group("/token")
 		tokenRoute.Use(middleware.UserAuth())
-		tokenRoute.Use(middleware.CORS())
+		// tokenRoute.Use(middleware.CORS())
 		{
 			tokenRoute.GET("/", controller.GetAllTokens)
 			tokenRoute.GET("/search", controller.SearchTokens)

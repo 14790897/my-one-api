@@ -48,10 +48,9 @@ func CORSMiddleware() gin.HandlerFunc {
 			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 			c.Writer.Header().Set("Vary", "Origin")
-
-			// 记录日志
 			c.Writer.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Origin, Access-Control-Allow-Credentials")
-			c.Writer.Header().Set("Access-Control-Max-Age", "600")
+			c.Writer.Header().Set("Access-Control-Max-Age", "6000")
+			// 记录日志
 			common.SysLog("CORS allowed for origin:" + origin)
 		// } else {
 		// 	// 记录被拒绝的 Origin
