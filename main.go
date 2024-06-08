@@ -27,12 +27,12 @@ var buildFS embed.FS
 var indexPage []byte
 
 // 允许的域名列表
-var allowedOrigins = map[string]bool{
-	"http://localhost:3000":    true,
-	"https://a.nextweb.fun":    true,
-	"http://localhost:3001":    true,
-	"https://api.paperai.life": true,
-}
+// var allowedOrigins = map[string]bool{
+// 	"http://localhost:3000":    true,
+// 	"https://a.nextweb.fun":    true,
+// 	"http://localhost:3001":    true,
+// 	"https://api.paperai.life": true,
+// }
 
 // CORS 中间件
 func CORSMiddleware() gin.HandlerFunc {
@@ -48,10 +48,9 @@ func CORSMiddleware() gin.HandlerFunc {
 			c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 			c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 			c.Writer.Header().Set("Vary", "Origin")
-
-			// 记录日志
 			c.Writer.Header().Set("Access-Control-Expose-Headers", "Access-Control-Allow-Origin, Access-Control-Allow-Credentials")
-			c.Writer.Header().Set("Access-Control-Max-Age", "600")
+			c.Writer.Header().Set("Access-Control-Max-Age", "6000")
+			// 记录日志
 			common.SysLog("CORS allowed for origin:" + origin)
 		// } else {
 		// 	// 记录被拒绝的 Origin
@@ -158,7 +157,7 @@ func main() {
 			},
 		})
 	}))
-	server.Use(CORSMiddleware()) // 添加 CORS 中间件
+	// server.Use(CORSMiddleware()) // 添加 CORS 中间件
 	// This will cause SSE not to work!!!
 	//server.Use(gzip.Gzip(gzip.DefaultCompression))
 	server.Use(middleware.RequestId())

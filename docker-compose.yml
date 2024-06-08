@@ -1,21 +1,21 @@
-version: '3.4'
+version: '3.8'
 
 services:
   new-api:
-    image: calciumion/new-api:latest
-    # build: .
+    image: 14790897/my-one-api:latest
+    network_mode: host
     container_name: new-api
     restart: always
     command: --log-dir /app/logs
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - ./data:/data
       - ./logs:/app/logs
     environment:
-      - SQL_DSN=root:123456@tcp(host.docker.internal:3306)/new-api  # 修改此行，或注释掉以使用 SQLite 作为数据库
-      - REDIS_CONN_STRING=redis://redis
-      - SESSION_SECRET=random_string  # 修改为随机字符串
+      - SQL_DSN=me:1f@2345678a9zxcas#%@tcp(localhost:3306)/oneapi  # 修改此行，或注释掉以使用 SQLite 作为数据库
+      - REDIS_CONN_STRING=redis://localhost:6379  # 修改此行以使用localhost
+      - SESSION_SECRET=b4c0a9b4-1278e-4f43-ae28-09d4ff4be74f  # 修改为随机字符串
       - TZ=Asia/Shanghai
 #      - NODE_TYPE=slave  # 多机部署时从节点取消注释该行
 #      - SYNC_FREQUENCY=60  # 需要定期从数据库加载数据时取消注释该行
@@ -33,3 +33,4 @@ services:
     image: redis:latest
     container_name: redis
     restart: always
+    network_mode: host
