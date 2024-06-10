@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go"
@@ -73,4 +74,35 @@ func StripeWebhook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "success"})
+}
+
+
+func IncreaseQuota(c *gin.Context) {
+	userIdStr := c.Query("user_id")
+	amountStr := c.Query("amount")
+
+	if userIdStr == "" || amountStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing user_id or amount"})
+		return
+	}
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
+		return
+	}
+
+	amount, err := strconv.Atoi(amountStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid amount"})
+		return
+	}
+
+	err = model.IncreaseUserQuota(userId, amount*int(common.QuotaPerUnit))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Quota increased successfully"})
 }
