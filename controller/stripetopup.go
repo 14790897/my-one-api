@@ -78,19 +78,28 @@ func StripeWebhook(c *gin.Context) {
 
 
 func IncreaseQuota(c *gin.Context) {
-	userIdStr := c.Query("user_id")
+	keyword := c.Query("username")
 	amountStr := c.Query("amount")
-
-	if userIdStr == "" || amountStr == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing user_id or amount"})
+	if keyword == "" || amountStr == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing username or amount"})
 		return
 	}
 
-	userId, err := strconv.Atoi(userIdStr)
+	users, err := model.SearchUsers(keyword, "")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
 		return
 	}
+
+	if len(users) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	userId := users[0].Id
 
 	amount, err := strconv.Atoi(amountStr)
 	if err != nil {
